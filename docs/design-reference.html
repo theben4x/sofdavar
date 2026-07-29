@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סוף דבר — רפרנס רכיבים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&family=Noto+Serif+Hebrew:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — מקור האמת היחיד. אל תכתוב hex בשום מקום אחר בפרויקט.
+   ============================================================ */
+:root {
+  --paper:        #F5F3EE;
+  --surface:      #FFFFFF;
+  --surface-soft: #F7F7F5;
+  --ink:          #14140F;
+  --ink-muted:    #8A8A82;
+  --rule:         #E4E2DC;
+  --rule-strong:  #14140F;
+
+  --cat-shabbat:  #C2512A;
+  --cat-kashrut:  #1D7D5E;
+  --cat-tefila:   #6B5FCB;
+  --cat-moadim:   #2E6FBF;
+
+  --font-sans:  'Heebo', system-ui, sans-serif;
+  --font-serif: 'Noto Serif Hebrew', Georgia, serif;
+
+  --r-card: 16px;
+  --r-tile: 12px;
+}
+
+[data-theme="dark"] {
+  --paper:        #16160F;
+  --surface:      #1D1D18;
+  --surface-soft: #24241E;
+  --ink:          #F0EEE6;
+  --ink-muted:    #8F8F86;
+  --rule:         #32322B;
+  --rule-strong:  #F0EEE6;
+
+  --cat-shabbat:  #E8845C;
+  --cat-kashrut:  #4FBF97;
+  --cat-tefila:   #9E94EE;
+  --cat-moadim:   #6BA3E8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 48px 24px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+}
+
+/* ============================================================
+   רכיב 1 — QuestionCard
+   שלושת הדברים שאסור "לתקן": ההטיה, המשקל 900, המידה הצרה.
+   ============================================================ */
+.question-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 44px 28px 48px;   /* המרווח הצדדי חייב להישאר — הפינות המסובבות חורגות */
+  text-align: center;
+  overflow: visible;
+}
+
+.question-card__badge {
+  display: inline-block;
+  transform: rotate(-2.5deg);
+  border: 2px solid var(--rule-strong);
+  border-radius: 4px;
+  padding: 9px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;          /* בלי זה הספרות נוגעות במסגרת ונראות חתוכות */
+  letter-spacing: 0.02em;
+  font-feature-settings: "tnum";
+}
+
+.question-card__title {
+  margin: 28px auto 0;
+  max-width: 240px;          /* מכריח שבירה ל-3–4 שורות. אל תגדיל. */
+  font-family: var(--font-serif);
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+   רכיב 2 — CategoryGrid
+   ============================================================ */
+.category-grid {
+  width: 100%;
+  max-width: 680px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-card);
+  padding: 20px;
+}
+
+.category-grid__heading {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.category-grid__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .category-grid__list { grid-template-columns: 1fr; }
+}
+
+.category-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface-soft);
+  border: 1px solid transparent;
+  border-radius: var(--r-tile);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .15s ease;
+}
+
+.category-tile:hover,
+.category-tile:focus-visible {
+  border-color: var(--rule);
+}
+
+.category-tile__icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.75;
+  fill: none;
+  stroke: currentColor;
+}
+
+.category-tile__name  { font-size: 15px; font-weight: 500; line-height: 1.3; }
+.category-tile__count { font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
+
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  padding: 8px 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'">החלף מצב תצוגה</button>
+
+<!-- ===== רכיב 1 ===== -->
+<article class="question-card">
+  <div class="question-card__badge">שאלה #2,847</div>
+  <h1 class="question-card__title">מותר לשמוע מוזיקה בתשעת הימים?</h1>
+</article>
+
+<!-- ===== רכיב 2 ===== -->
+<section class="category-grid">
+  <h2 class="category-grid__heading">דפדוף לפי קטגוריה</h2>
+  <div class="category-grid__list">
+
+    <a class="category-tile" href="#" style="--icon: var(--cat-shabbat)">
+      <svg class="category-tile__icon" style="color: var(--cat-shabbat)" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2c1 3-1 4-1 6a3 3 0 0 0 6 0c0-1-.3-2-1-3 2 2 3 4 3 7a7 7 0 1 1-14 0c0-4 3-7 7-10z"/>
+      </svg>
+      <div>
+        <div class="category-tile__name">שבת</div>
+        <div class="category-tile__count">842 שאלות</div>
+      </div>
+    </a>
+
+    <a class="category-tile" href="#">
+      <svg class="category-tile__icon" style="color: var(--cat-kashrut)" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 3v8m0 0a2.5 2.5 0 0 0 2.5-2.5V3M7 11a2.5 2.5 0 0 1-2.5-2.5V3M7 11v10M17 3c-1.5 1.5-2 3-2 5s.7 3 2 3v10"/>
+      </svg>
+      <div>
+        <div class="category-tile__name">כשרות</div>
+        <div class="category-tile__count">617 שאלות</div>
+      </div>
+    </a>
+
+    <a class="category-tile" href="#">
+      <svg class="category-tile__icon" style="color: var(--cat-tefila)" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 6c-1.5-1.3-3.6-2-6-2H3v14h3c2.4 0 4.5.7 6 2m0-14c1.5-1.3 3.6-2 6-2h3v14h-3c-2.4 0-4.5.7-6 2m0-14v14"/>
+      </svg>
+      <div>
+        <div class="category-tile__name">תפילה</div>
+        <div class="category-tile__count">493 שאלות</div>
+      </div>
+    </a>
+
+    <a class="category-tile" href="#">
+      <svg class="category-tile__icon" style="color: var(--cat-moadim)" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="5" width="18" height="16" rx="2"/>
+        <path d="M3 10h18M8 3v4M16 3v4M12 13l1 2.2 2.4.3-1.7 1.7.4 2.4-2.1-1.1-2.1 1.1.4-2.4L8.6 15.5l2.4-.3z"/>
+      </svg>
+      <div>
+        <div class="category-tile__name">מועדים</div>
+        <div class="category-tile__count">755 שאלות</div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+</body>
+</html>

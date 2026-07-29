@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% from "macros.html" import ornament %}
+
+{% block content %}
+<section class="section" style="padding-bottom:20px">
+  <div class="wrap">
+    <p class="eyebrow">כלי</p>
+    <h1 class="section__title" style="font-size:clamp(28px,4.4vw,42px)">מה נברך</h1>
+    {# הכלי קודם, ההסבר אחר כך: מי שמגיע לכאן רוצה תשובה על מאכל מסוים,
+       ופסקת מבוא ארוכה דוחפת את הטבלה אל מתחת לקיפול בטלפון. #}
+    <p style="margin-top:12px;max-width:60ch;color:var(--ink-muted)">
+      ברכה ראשונה וברכה אחרונה למאות מאכלים ומשקאות. הקלידו שם מאכל או סננו לפי קבוצה.
+    </p>
+  </div>
+</section>
+
+<section style="padding-bottom:44px">
+  <div class="wrap">
+    {# הכלי נשאר נגיש בכל עומק גלילה — הטבלה מגיעה ל~14,500px בנייד. #}
+    <div class="beracha-sticky">
+      <div class="controls">
+        <div class="field" style="flex:1;min-width:240px">
+          <label class="field__label" for="beracha-filter">חיפוש מאכל</label>
+          <input id="beracha-filter" type="search" style="width:100%"
+                 placeholder="למשל: פיצה, תמר, קפה" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="chip-row" id="beracha-categories">
+        <button class="chip" type="button" data-category="" aria-pressed="true">הכול</button>
+        {% for name in food_categories %}
+        <button class="chip" type="button" data-category="{{ name }}" aria-pressed="false">{{ name }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <p class="visually-hidden" role="status" aria-live="polite" id="beracha-status"></p>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="table-scroll">
+        <table class="beracha-table" id="beracha-table">
+          <caption class="visually-hidden">טבלת ברכות ראשונות ואחרונות</caption>
+          <thead>
+            <tr>
+              <th scope="col">מאכל</th>
+              <th scope="col">ברכה ראשונה</th>
+              <th scope="col">ברכה אחרונה</th>
+              <th scope="col">קבוצה</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for food in foods %}
+            <tr data-name="{{ food.name }}"
+                data-aliases="{{ food.aliases | join(' ') }}"
+                data-category="{{ food.category }}">
+              <td>
+                <div class="beracha-table__name">{{ food.name }}</div>
+                {% if food.note %}<div class="beracha-table__note">{{ food.note }}</div>{% endif %}
+              </td>
+              <td><span class="tag">{{ food.first }}</span></td>
+              <td><span class="tag">{{ food.last }}</span></td>
+              <td class="beracha-table__note">{{ food.category }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="empty" id="beracha-empty" hidden>
+        <span class="empty__text">לא נמצא מאכל מתאים. אפשר לנסות שם אחר או לבחור קבוצה.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+{% if blessing_texts.blessings %}
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    {{ ornament() }}
+    <h2 class="section__title" style="font-size:24px;margin:26px 0 12px">נוסח הברכות</h2>
+    {% if blessing_texts.intro %}
+    <p class="prose" style="margin-bottom:14px;font-size:16px">{{ blessing_texts.intro }}</p>
+    {% endif %}
+    <p style="color:var(--ink-muted);margin-bottom:18px">
+      הנוסח מנוקד במלואו וניתן לקריאה ישירה מהמסך.
+    </p>
+    <div class="grid-cards">
+      {% for blessing in blessing_texts.blessings %}
+      <div class="blessing-card">
+        <div class="blessing-card__title">{{ blessing.title }}</div>
+        <p class="blessing-card__text">{{ blessing.text_nikud }}</p>
+        <p class="blessing-card__when">{{ blessing.when }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if blessing_texts.rules %}
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <h2 class="section__title" style="font-size:24px;margin-bottom:18px">כללי יסוד</h2>
+    <div class="grid-cards">
+      {% for rule in blessing_texts.rules %}
+      <div class="card">
+        <h3 class="card__title">{{ rule.title }}</h3>
+        <p style="font-size:15px;color:var(--ink-muted)">{{ rule.text }}</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <p class="disclaimer">
+      הטבלה נועדה להתמצאות מהירה. יש מאכלים שברכתם משתנה לפי אופן ההכנה, לפי
+      הכמות ולפי מה שנאכל איתם. בספק — יש לשאול.
+    </p>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "macros.html" import search_box %}
+
+{% block content %}
+<section class="section">
+  <div class="wrap wrap--narrow">
+    <p class="eyebrow">חיפוש</p>
+    <h1 class="section__title" style="font-size:clamp(28px,4.4vw,40px)">
+      חיפוש במאגר
+    </h1>
+    {{ search_box(value=query, autofocus=true) }}
+  </div>
+</section>
+
+<section style="padding-bottom:60px">
+  <div class="wrap wrap--narrow">
+    {% if query and results %}
+    <p style="color:var(--ink-muted);margin-bottom:16px">
+      {{ results | length }} תוצאות עבור &laquo;{{ query }}&raquo;
+    </p>
+    <ul style="list-style:none;margin:0;padding:0;display:grid;gap:10px">
+      {% for result in results %}
+      <li>
+        <a class="search__option" href="{{ result.url }}"
+           style="border:1px solid var(--rule);background:var(--surface)">
+          <span class="search__badge search__badge--{{ result.kind }}">{{ result.kind_label }}</span>
+          <span class="search__text">
+            <span class="search__title" style="white-space:normal">{{ result.title }}</span>
+            <span class="search__meta">{{ result.subtitle }}</span>
+          </span>
+          {% if result.number %}<span class="search__number">#{{ result.number }}</span>{% endif %}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% elif query %}
+    <div class="empty">
+      <p class="empty__title">לא נמצאו תוצאות</p>
+      <p class="empty__text">
+        לא נמצאה התאמה ל&laquo;{{ query }}&raquo;. אפשר לנסות מילה אחת במקום צירוף,
+        או לדפדף לפי נושא.
+      </p>
+      <a class="button button--gold" href="{{ url_for('home') }}#categories">לכל הנושאים</a>
+    </div>
+
+    {% else %}
+    <div class="empty">
+      <p class="empty__text">
+        הקלידו נושא או שאלה. החיפוש מזהה גם כתיב בלי ניקוד וגם אותיות שימוש —
+        &laquo;בשבת&raquo; ימצא את &laquo;שבת&raquo;.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

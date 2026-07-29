@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "macros.html" import qa_accordion_item, search_box, ornament %}
+
+{% block content %}
+<section class="section">
+  <div class="wrap wrap--narrow">
+    <nav class="breadcrumbs" aria-label="מיקום">
+      <a href="{{ url_for('home') }}">{{ site_name }}</a>
+      <span class="breadcrumbs__sep">›</span>
+      <span aria-current="page">{{ category.name }}</span>
+    </nav>
+
+    <p class="eyebrow">נושא</p>
+    <h1 class="section__title" style="font-size:clamp(30px,5vw,46px)">{{ category.name }}</h1>
+    {% if category.blurb %}
+    <p class="category-intro">{{ category.blurb }}</p>
+    {% endif %}
+
+    <p class="category-tags">
+      <span class="tag">{{ questions | length }} שאלות</span>
+      {% if questions %}
+      <span class="tag">
+        מספרים {{ questions[0].number }}–{{ questions[-1].number }}
+      </span>
+      {% endif %}
+    </p>
+  </div>
+</section>
+
+<section style="padding-bottom:54px">
+  <div class="wrap wrap--narrow">
+    {% if questions %}
+    <div class="qa-list">
+      {% for question in questions %}
+        {{ qa_accordion_item(question, category.slug) }}
+      {% endfor %}
+    </div>
+
+    <p class="disclaimer">
+      בעמוד הזה מוצגת התשובה הישירה בלבד. התשובה המלאה, המקורות והבדלי המנהג
+      נמצאים בעמוד של כל שאלה.
+    </p>
+    {% else %}
+    <div class="empty">
+      <p class="empty__title">אין עדיין שאלות בנושא הזה</p>
+      <p class="empty__text">הנושא נבנה. בינתיים אפשר לעיין בשאר הנושאים.</p>
+      <a class="button button--gold" href="{{ url_for('home') }}">לכל הנושאים</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap wrap--narrow">
+    {{ ornament() }}
+    <div style="margin-top:26px">
+      {{ search_box() }}
+    </div>
+  </div>
+</section>
+{% endblock %}

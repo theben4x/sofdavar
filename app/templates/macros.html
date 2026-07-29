@@ -1,0 +1,96 @@
+{# רכיבים חוזרים. שומר על עקביות בין דף הבית, עמוד הקטגוריה והחיפוש. #}
+
+{% macro ornament() %}
+<div class="ornament" aria-hidden="true">
+  <svg class="ornament__mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+    <path d="M12 2 15 12 12 22 9 12Z"/>
+    <path d="M2 12h20" opacity=".55"/>
+  </svg>
+</div>
+{% endmacro %}
+
+
+{# רשת הקטגוריות המלכותית — מועתקת מ-DES/category-grid-royal.html.
+   הכותרת יושבת בתוך הפאנל ולא מעליו, ולכן העמוד הקורא לא צריך כותרת נוספת. #}
+{% macro category_grid(heading='דפדוף לפי קטגוריה', eyebrow='המאגר', categories=[]) %}
+<div class="cat-divider" aria-hidden="true"><span></span><i></i><span></span></div>
+
+<section class="cat-panel">
+  {# המיקום עבר ל-CSS: הוא נגזר מרדיוס הפאנל, ולכן אסור לו להיות מוקשח כאן. #}
+  <span class="cat-panel__corner cat-panel__corner--tr"></span>
+  <span class="cat-panel__corner cat-panel__corner--tl"></span>
+  <span class="cat-panel__corner cat-panel__corner--br"></span>
+  <span class="cat-panel__corner cat-panel__corner--bl"></span>
+
+  <div class="cat-panel__head">
+    <div class="cat-panel__eyebrow">{{ eyebrow }}</div>
+    <h2 class="cat-panel__title">{{ heading }}</h2>
+  </div>
+
+  <div class="cat-grid">
+    {% for category in categories %}
+    <a class="cat-tile" href="/{{ category.slug }}" style="--i:{{ loop.index }}">
+      <span class="cat-tile__icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">{{ category.icon | safe }}</svg>
+      </span>
+      <span>
+        <span class="cat-tile__name">{{ category.name }}</span>
+        <span class="cat-tile__count">{{ category.question_count }} שאלות</span>
+      </span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endmacro %}
+
+
+{# תיבת החיפוש. תבנית combobox: הקלט שולט ברשימה, והרשימה עצמה listbox. #}
+{% macro search_box(value='', autofocus=false) %}
+<form class="search" id="search" role="search" action="{{ url_for('search_page') }}" method="get">
+  <label class="visually-hidden" for="search-input">חיפוש נושא או שאלה</label>
+  <div class="search__field">
+    <svg class="search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+    </svg>
+    <input class="search__input" id="search-input" name="q" type="search"
+           value="{{ value }}" placeholder="חפשו נושא או שאלה — למשל: מוקצה, ברכה על פיצה"
+           autocomplete="off" role="combobox" aria-expanded="false"
+           aria-controls="search-panel" aria-autocomplete="list"
+           {% if autofocus %}autofocus{% endif %}>
+    <button class="search__clear" type="button" id="search-clear" aria-label="נקה חיפוש">×</button>
+    {# הטופס הוא GET רגיל ל-/search, ולכן הכפתור עובד גם בלי JS — בדיוק כמו Enter. #}
+    <button class="search__submit" type="submit">חיפוש</button>
+  </div>
+  <ul class="search__panel" id="search-panel" role="listbox"
+      aria-label="הצעות חיפוש" hidden></ul>
+  <p class="visually-hidden" id="search-status" role="status" aria-live="polite"></p>
+</form>
+{% endmacro %}
+
+
+{# פריט אקורדיון בעמוד הקטגוריה. התשובה המלאה נמצאת רק בעמוד השאלה. #}
+{% macro qa_accordion_item(question, category_slug) %}
+<details class="qa-item">
+  <summary class="qa-item__summary">
+    <span class="qa-item__number"><span class="qa-item__number-word">שאלה </span>{{ question.number }}</span>
+    <span class="qa-item__question">{{ question.question }}</span>
+    <svg class="qa-item__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </summary>
+  <div class="qa-item__body">
+    <p style="font-family:var(--font-serif);font-size:17px;font-weight:700;line-height:1.5">
+      {{ question.short_answer }}
+    </p>
+    <a class="button button--gold" href="/{{ category_slug }}/{{ question.slug }}">
+      לתשובה המלאה ולמקורות
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5m7-7-7 7 7 7"/>
+      </svg>
+    </a>
+  </div>
+</details>
+{% endmacro %}

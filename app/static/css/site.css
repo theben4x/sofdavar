@@ -1,0 +1,2152 @@
+/* ============================================================================
+   סוף דבר — מערכת העיצוב
+   ----------------------------------------------------------------------------
+   הבסיס לקוח מ-design-reference.html ואסור לסטות ממנו: הטוקנים, ה-QuestionCard
+   וה-CategoryGrid מועתקים כלשונם, כולל ההטיה של התג והמידה הצרה של הכותרת.
+   מעליו יושבת שכבה "מלכותית" — זהב מדוד, כותרות בסריף, קווים כפולים ועיטורים —
+   שנוגעת רק במסגרת: כותרת עליונה, גיבור, מפרידים, כרטיסים ופוטר.
+   ========================================================================== */
+
+/* ============================================================
+   TOKENS — מקור האמת היחיד. אל תכתוב hex בשום מקום אחר בפרויקט.
+   ============================================================ */
+:root {
+  --paper:        #F5F3EE;
+  /* קצה העמוד (edge-only/page-background.css). הקובץ נתן #E3DCC9 — הפרש
+     בהירות של ~7%, שנקרא חלש מדי על מסך אמיתי. הוכהה לכ-1.8 מזה. */
+  --paper-edge:   #D3C7A6;
+  --surface:      #FFFFFF;
+  --surface-soft: #F7F7F5;
+  --ink:          #14140F;
+  /* היה #8A8A82 — 3.48:1 על לבן, נכשל ב-WCAG AA. עכשיו 5.14:1. */
+  --ink-muted:    #6E6E66;
+  --rule:         #E4E2DC;
+  --rule-strong:  #14140F;
+
+  --cat-shabbat:  #C2512A;
+  --cat-kashrut:  #1D7D5E;
+  --cat-tefila:   #6B5FCB;
+  --cat-moadim:   #2E6FBF;
+  --cat-berachot: #B0752B;
+  --cat-bein:     #9A3B6B;
+  --cat-mishpacha:#2F7F86;
+  --cat-avelut:   #5C6470;
+  --cat-mamonot:  #7A6A2F;
+  --cat-stam:     #8A4B2A;
+
+  --font-sans:  'Heebo', system-ui, sans-serif;
+  --font-serif: 'Noto Serif Hebrew', Georgia, serif;
+
+  --r-card: 16px;
+  --r-tile: 12px;
+
+  /* ---- שכבה מלכותית ---- */
+  --gold:        #A67C2E;  /* לקווים, עיטורים וטקסט גדול */
+  --gold-deep:   #6F4F17;  /* לטקסט קטן — עומד ב-AA על נייר */
+  --gold-veil:   rgba(166, 124, 46, .12);
+  --gold-sheen:  linear-gradient(100deg, transparent 0%, rgba(166,124,46,.20) 45%, transparent 90%);
+  --royal-wash:  radial-gradient(120% 90% at 50% 0%, rgba(166,124,46,.10), transparent 62%);
+
+  --shadow-royal: 0 1px 0 var(--rule), 0 18px 40px -28px rgba(20, 20, 15, .45);
+
+  /* ch מכויל לרוחב האפס הלטיני. 66ch נתן 84 תווים עבריים לשורה — הרבה
+     מעבר לטווח הנוח. 55ch ≈ 70 תווים. */
+  --measure: 55ch;
+
+  /* רוחב עמודת התוכן. מקור אמת אחד ל-.wrap ולהכהיית הקצוות — הגרדיאנט
+     נעצר בדיוק בקצה העמודה, ולכן השניים חייבים לא להיפרד. */
+  --wrap: 1080px;
+
+  /* גובה הכותרת הדביקה: 68px min-height + גבול 1px + פס הזהב 2px.
+     כמה תיקונים נשענים עליו (עוגן דילוג, חיפוש דביק, גלילה לעוגן),
+     ולכן הוא טוקן ולא מספר קשיח. */
+  --topbar-h: 71px;
+
+  /* ---- טוקנים של רשת הקטגוריות המלכותית (DES/category-grid-royal.html) ----
+     נשמרים בנפרד מטוקני האתר: הפאנל מכוון לנייר חם יותר מ---surface,
+     ולזהב עמום משלו. --gold-royal לעולם לא #FFD700 — צהוב בהיר נראה זול. */
+  --panel:      #FAF7F0;
+  --tile-hover: #F4EEE0;
+  --line:       #E0D6BE;
+  --line-soft:  #D8CBAA;
+  --line-tile:  #E2D9C4;
+  --gold-royal: #B8912E;
+  --gold-ring:  #D5C79F;
+  --gold-ink:   #9A7B22;
+  --ink-soft:   #7E7561;   /* כהה מהמקור (#9B917C) כדי לעבור AA על --panel */
+  --shimmer:    rgba(184, 145, 46, .16);
+
+  /* ---- מונה השאלות המונפש (counter-pkg/counter-animated.html) ---- */
+  --ctr-fill:   #F0E9D8;
+  --ctr-border: #C9A227;
+  --ctr-text:   #3E3629;
+  --ctr-num:    #7A5C15;
+  --ctr-caret:  #8A6A18;
+}
+
+[data-theme="dark"] {
+  --paper:        #16160F;
+  /* בכהה ההיגיון מתהפך: הקצוות בהירים מעט מהמרכז. הוגבר באותו יחס
+     כמו בבהיר, כדי שעוצמת ההפרדה תיקרא זהה בשתי הערכות. */
+  --paper-edge:   #221E13;
+  --surface:      #1D1D18;
+  --surface-soft: #24241E;
+  --ink:          #F0EEE6;
+  --ink-muted:    #8F8F86;
+  --rule:         #32322B;
+  --rule-strong:  #F0EEE6;
+
+  --cat-shabbat:  #E8845C;
+  --cat-kashrut:  #4FBF97;
+  --cat-tefila:   #9E94EE;
+  --cat-moadim:   #6BA3E8;
+  --cat-berachot: #E0AE62;
+  --cat-bein:     #DE84B4;
+  --cat-mishpacha:#5FBEC6;
+  --cat-avelut:   #A3ACB9;
+  --cat-mamonot:  #C6B268;
+  --cat-stam:     #D08A62;
+
+  --gold:        #D8B15C;
+  --gold-deep:   #EBCA84;
+  --gold-veil:   rgba(216, 177, 92, .14);
+  --gold-sheen:  linear-gradient(100deg, transparent 0%, rgba(216,177,92,.24) 45%, transparent 90%);
+  --royal-wash:  radial-gradient(120% 90% at 50% 0%, rgba(216,177,92,.10), transparent 62%);
+
+  --shadow-royal: 0 1px 0 var(--rule), 0 18px 40px -28px rgba(0, 0, 0, .8);
+
+  /* ---- רשת הקטגוריות המלכותית, מצב כהה ---- */
+  --panel:      #1C1913;
+  --tile-hover: #26221A;
+  --line:       #3A3327;
+  --line-soft:  #2F291E;
+  --line-tile:  #322C21;
+  --gold-royal: #C9A227;
+  --gold-ring:  #5A4C25;
+  --gold-ink:   #D6B448;
+  --ink-soft:   #A69D88;
+  --shimmer:    rgba(201, 162, 39, .20);
+
+  /* ---- מונה השאלות המונפש, מצב כהה ---- */
+  --ctr-fill:   #221E15;
+  --ctr-border: #C9A227;
+  --ctr-text:   #E8E1D0;
+  --ctr-num:    #D6B448;
+  --ctr-caret:  #D6B448;
+}
+
+/* ============================================================
+   בסיס
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* בלי זה קפיצה לעוגן נוחתת מתחת לכותרת הדביקה. */
+  scroll-padding-top: calc(var(--topbar-h) + 8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* שתי שכבות רקע, לא אחת. הקובץ המקורי (edge-only/page-background.css) כותב
+   `background:` מקוצר על body — כאן זה היה מוחק את --royal-wash ואת
+   background-size שמתחתיו, ומחזיר את הבאג של /ma-nevarech. לכן ההכהיה
+   נכנסת כשכבה *שנייה*, מתחת לזוהר. הסדר קובע — הראשון הוא העליון.
+
+   העצירות מחושבות מרוחב עמודת התוכן ולא באחוזי מסך, וזה השינוי המהותי
+   מהקובץ. 20%/80% עובדים רק מ-1920px ומעלה: ב-1440px עצירת ה-20% נופלת
+   ב-288px בעוד השוליים הם 180px בלבד, כך שהרמפה נכנסת אל תוך עמודת התוכן
+   ומה שנשאר בשוליים הוא רסיס חיוור. עם calc ההכהיה תופסת בדיוק את השוליים
+   בכל רוחב מסך, ונעצרת על הפיקסל שבו התוכן מתחיל. */
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: var(--royal-wash),
+                    linear-gradient(90deg,
+                      var(--paper-edge) 0,
+                      var(--paper)      calc(50% - var(--wrap) / 2),
+                      var(--paper)      calc(50% + var(--wrap) / 2),
+                      var(--paper-edge) 100%);
+  background-repeat: no-repeat, no-repeat;
+  /* בלי זה הזוהר נמתח לגובה כל העמוד: ב-/ma-nevarech הוא מכסה 12,000px
+     במקום ~1,200px, וצובע את כל הגלילה. */
+  background-size: 100% 2000px, 100% 100%;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* לקובץ המקורי יש כאן @media (max-width: 1180px) שמכבה את ההכהיה בנייד.
+   כאן הוא מיותר ואף מזיק: הגרדיאנט נגזר מ---wrap, ולכן ברגע שהמסך צר
+   מעמודת התוכן שתי העצירות האמצעיות מתאפסות והוא משטח את עצמו לנייר אחיד.
+   שוליים של 50px ב-1150px כן יקבלו הכהיה — וזה בדיוק מה שרוצים.
+   גם הסיבה השנייה שלו נעלמה: אין יותר background-attachment:fixed, ולכן
+   אין את קרעי הגלילה שהוא גורם להם בדפדפנים ניידים. */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+a { color: inherit; }
+
+p { margin: 0 0 1em; }
+p:last-child { margin-bottom: 0; }
+
+img, svg { max-width: 100%; }
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* 71 הפיקסלים הראשונים של <main> היו נבלעים מאחורי הכותרת הדביקה אחרי
+   שימוש בקישור הדילוג. tabindex="-1" נותן פוקוס תוכניתי בלבד, שאינו מדליק
+   ‎:focus-visible‎ — ה-outline מכסה דפדפנים שכן מציירים טבעת. */
+#main { scroll-margin-top: calc(var(--topbar-h) + 8px); }
+#main:focus { outline: none; }
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+.wrap--narrow { max-width: 760px; }
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 50%;
+  top: -100px;
+  transform: translateX(50%);
+  z-index: 100;
+  padding: 10px 18px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 0 0 var(--r-tile) var(--r-tile);
+  transition: top .15s ease;
+}
+.skip-link:focus { top: 0; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   עיטורים מלכותיים
+   ============================================================ */
+.rule-royal {
+  border: 0;
+  height: 3px;
+  margin: 0;
+  background:
+    linear-gradient(var(--gold), var(--gold)) center/100% 1px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) center/100% 1px no-repeat;
+  background-position: center top, center bottom;
+  opacity: .5;
+}
+
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--gold);
+  margin: 0;
+}
+.ornament::before,
+.ornament::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: .4;
+}
+.ornament__mark {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  opacity: .8;
+}
+
+/* ============================================================
+   כותרת עליונה
+   ============================================================ */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* בלי התחילית ספארי מתעלם מהטשטוש אבל שומר על רקע 88% — התוכן שמתחת
+   נראה דרך הכותרת. אין טשטוש, אין שקיפות. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .topbar { background: var(--paper); }
+}
+.topbar::after {
+  content: "";
+  display: block;
+  height: 2px;
+  background: var(--gold-sheen);
+}
+
+/* flex הוא מצב הנייד: שם ה-nav יוצא מהזרימה (תפריט נפתח) ורק שני פריטים
+   נשארים בשורה. בדסקטופ עוברים לגריד — ראה למטה. */
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 68px;
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* שלוש עמודות, ושתי הקיצוניות שוות (1fr) — זה מה שמעמיד את הניווט במרכז
+   *העמוד*. עם flex ו-margin:auto הוא היה ממורכז בין הלוגו לפקדים, וכיוון
+   שהלוגו רחב מהם בהרבה המרכז היה יוצא מוסט שמאלה. */
+@media (min-width: 861px) {
+  .topbar__inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+  }
+  .logo { justify-self: start; }
+  .nav {
+    justify-content: center;
+    margin-inline-start: 0;   /* מבטל את ה-auto שדחף אותו לקצה */
+  }
+  .topbar__actions { justify-self: end; }
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+  flex: none;
+}
+.logo__mark {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  color: var(--gold);
+}
+.logo__text { display: flex; flex-direction: column; line-height: 1; }
+.logo__name {
+  font-family: var(--font-serif);
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.logo__sub {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  color: var(--gold-deep);
+  margin-top: 4px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-inline-start: auto;
+}
+.nav__link {
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--ink);
+  white-space: nowrap;
+  transition: background-color .15s ease, color .15s ease;
+}
+.nav__link:hover { background: var(--gold-veil); }
+.nav__link[aria-current="page"] {
+  color: var(--gold-deep);
+  background: var(--gold-veil);
+  font-weight: 700;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.icon-button:hover { border-color: var(--gold); background: var(--gold-veil); }
+.icon-button svg { width: 18px; height: 18px; }
+
+/* האייקון מראה לאן הלחיצה מובילה, לא היכן אנחנו נמצאים:
+   במצב בהיר מוצג ירח (עבור למצב כהה), ובמצב כהה מוצגת שמש. */
+.icon-button .icon-sun  { display: none; }
+.icon-button .icon-moon { display: block; }
+[data-theme="dark"] .icon-button .icon-sun  { display: block; }
+[data-theme="dark"] .icon-button .icon-moon { display: none; }
+
+.nav-toggle { display: none; }
+
+@media (max-width: 860px) {
+  .nav-toggle { display: inline-grid; }
+  .nav {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 20px 16px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    display: none;
+  }
+  .topbar--open .nav { display: flex; }
+  .nav__link { border-radius: var(--r-tile); padding: 12px 14px; }
+  .logo__sub { display: none; }
+
+  /* .nav יוצא מהזרימה בנייד ואיתו נעלם ה-margin-inline-start:auto שדחף את
+     הכפתורים לקצה — הפקדים נדחסו לרבע אחד ו-140px נשארו ריקים. מחזירים
+     את ה-auto לרכיב הראשון שאחרי ה-nav, יהיה אשר יהיה. */
+  .nav + * { margin-inline-start: auto; }
+}
+
+/* ============================================================
+   גיבור — הפסוק, המונה והחיפוש
+   ============================================================ */
+.hero {
+  padding: 72px 0 56px;
+  text-align: center;
+}
+
+/* המרווח בין המונה לרשת הקטגוריות היה 110px — 56px תחתית הגיבור ועוד 54px
+   ראש המקטע. השניים כבר מופרדים במפריד המעוין שבראש הרשת, ולכן מרווח כפול
+   נקרא כניתוק ולא כנשימה. מוצמצם ל-70px.
+   רק מ-641px ומעלה: בנייד המרווח כבר 48px, ותיקון גורף היה מרחיב אותו. */
+@media (min-width: 641px) {
+  .hero { padding-bottom: 40px; }
+  #categories { padding-top: 30px; }
+}
+
+.hero__crown {
+  width: 46px;
+  height: 46px;
+  color: var(--gold);
+  margin: 0 auto 26px;
+  display: block;
+}
+
+/* 30ch ולא 21ch: ב-21ch הפסוק נשבר לשלוש שורות. 30ch מחזיק אותו בשתיים,
+   עם השבירה אחרי "וְאֶת" — בדיוק כמו במקור. */
+.hero__verse {
+  font-family: var(--font-serif);
+  font-size: clamp(23px, 4.2vw, 40px);
+  font-weight: 500;
+  line-height: 1.75;
+  max-width: 30ch;
+  margin: 0 auto;
+  /* הניקוד הוא לב הפסוק — בלי זה הוא מאבד את המשקל שלו */
+  font-feature-settings: "kern";
+}
+
+/* שני הציוויים שבפסוק. --gold-deep ולא --gold: הוא מתהפך בין הערכות
+   ונשאר קריא בשתיהן, ובבהיר הוא נותן 6.8:1 על הנייר. */
+.hero__verse .verse-em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--gold-deep);
+}
+
+.hero__source {
+  margin: 18px 0 0;
+  font-size: 13px;
+  letter-spacing: .14em;
+  color: var(--gold-deep);
+  font-weight: 500;
+}
+
+/* ============================================================
+   מונה השאלות המונפש  (מ-counter-pkg/counter-animated.html)
+   כוריאוגרפיה: קפסולה נכנסת → מעוינים נדלקים → הטקסט נכתב בפנים →
+   הסמן נעלם → קווי הזהב נמתחים החוצה. הרצף הוא מה שהופך את זה למכוון —
+   אל תריץ הכל במקביל.
+   ============================================================ */
+/* 24px ולא 38px: המונה יושב *מתחת* לתיבת החיפוש, ו-38px היו מנתקים
+   אותו ממנה. 38px היו המרווח מהפסוק, כשהוא עוד ישב מעליה. */
+.counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  margin-top: 24px;
+}
+
+.counter__rule { height: .5px; background: var(--ctr-border); width: 0; }
+
+.counter__dot {
+  width: 6px;
+  height: 6px;
+  background: var(--ctr-border);
+  transform: rotate(45deg);
+  flex: none;
+  opacity: 0;
+}
+
+.counter__pill {
+  position: relative;
+  display: inline-block;
+  border: 1px solid var(--ctr-border);
+  border-radius: 999px;
+  background: var(--ctr-fill);
+  padding: 13px 31px;
+  opacity: 0;
+}
+
+.counter__line {
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  font-size: 17px;
+  font-weight: 500;          /* 500 ולא 600 — בעברית משקל גבוה סותם את האותיות */
+  color: var(--ctr-text);
+  line-height: 1.5;
+}
+
+.counter__num {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 22px;           /* ספרות סריף נראות קטנות יותר מסאנס באותו גודל */
+  color: var(--ctr-num);
+  font-feature-settings: "tnum";   /* חובה — בלי זה השורה קופצת */
+  margin: 0 6px;
+}
+
+/* עותק נסתר שמחזיק את רוחב הקפסולה מראש.
+   בלעדיו הקפסולה מתנפחת תו אחר תו והמעוינים נדחפים החוצה. */
+.counter__ghost { visibility: hidden; display: inline-block; }
+
+/* הטקסט המונפש יושב מעל העותק הנסתר. ב-RTL הוא נחשף מימין לשמאל, ולכן
+   ה-border-inline-start משמש כסמן ההקלדה ונע לבד עם הקצה. */
+.counter__typer {
+  position: absolute;
+  top: 13px;
+  inset-inline-end: 31px;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  border-inline-start: 1.5px solid transparent;
+}
+
+/* האנימציה רצה רק כשנוספת המחלקה is-visible */
+.counter.is-visible .counter__pill   { animation: ctrPop .5s cubic-bezier(.2,.8,.3,1) forwards; }
+.counter.is-visible .counter__dot    { animation: ctrDot .4s ease-out .2s forwards; }
+.counter.is-visible .counter__dot--b { animation-delay: .3s; }
+.counter.is-visible .counter__typer  { animation: ctrType 1.5s steps(27) .5s forwards,
+                                                  ctrBlink .8s step-end .5s 2,
+                                                  ctrHide .01s 2.1s forwards; }
+.counter.is-visible .counter__rule   { animation: ctrGrow .8s cubic-bezier(.2,.8,.3,1) 2.15s forwards; }
+
+@keyframes ctrPop   { from { opacity: 0; transform: scale(.92) } to { opacity: 1; transform: scale(1) } }
+@keyframes ctrType  { from { width: 0 } to { width: var(--tw) } }   /* --tw נמדד ב-JS */
+@keyframes ctrGrow  { from { width: 0 } to { width: 74px } }
+@keyframes ctrBlink { 0%, 100% { border-inline-start-color: var(--ctr-caret) } 50% { border-inline-start-color: transparent } }
+@keyframes ctrHide  { to { border-inline-start-color: transparent } }
+@keyframes ctrDot   { from { opacity: 0; transform: rotate(45deg) scale(.4) }
+                      to   { opacity: 1; transform: rotate(45deg) scale(1) } }
+
+/* נגישות: מצב סופי מיד, בלי תנועה. בלי זה הקפסולה נשארת ב-opacity:0
+   למי שכיבה אנימציות. */
+@media (prefers-reduced-motion: reduce) {
+  .counter__pill  { opacity: 1; animation: none !important; }
+  .counter__dot   { opacity: 1; animation: none !important; }
+  .counter__rule  { width: 74px; animation: none !important; }
+  .counter__ghost { visibility: visible; }
+  .counter__typer { display: none; }
+}
+
+/* ============================================================
+   חיפוש — תבנית combobox נגישה
+   ============================================================ */
+.search {
+  position: relative;
+  max-width: 620px;
+  margin: 34px auto 0;
+  text-align: start;
+}
+
+.search__field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* הקצה הפנימי צר — כפתור החיפוש יושב שם וצריך להיצמד לגלולה. */
+  padding-block: 0;
+  padding-inline-start: 20px;
+  padding-inline-end: 6px;
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  border-radius: 999px;
+  box-shadow: var(--shadow-royal);
+  transition: border-color .15s ease;
+}
+.search__field:focus-within { border-color: var(--gold); }
+
+.search__icon { width: 20px; height: 20px; flex: none; color: var(--ink-muted); }
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  padding: 17px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+}
+.search__input::placeholder { color: var(--ink-muted); }
+.search__input:focus { outline: none; }
+
+.search__clear {
+  display: none;
+  flex: none;
+  width: 28px; height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--ink-muted);
+  cursor: pointer;
+  line-height: 1;
+  font-size: 17px;
+}
+.search--filled .search__clear { display: block; }
+
+/* --gold-deep מתהפך בין הערכות — כהה על נייר, בהיר על רקע כהה — ולכן אותו
+   זוג טוקנים נותן 6.8:1 במצב בהיר ו-11.9:1 במצב כהה. אל תחליף ל---gold:
+   הוא נותן 3.4:1 על טקסט בגודל רגיל ונופל ב-AA. */
+.search__submit {
+  flex: none;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--gold-deep);
+  color: var(--paper);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .15s ease;
+}
+.search__submit:hover { background: var(--ink); }
+
+/* ============================================================
+   מצב כהה בלבד — יישור לזהב של המונה
+   ------------------------------------------------------------
+   שלושת המבטאים בגיבור מתיישרים ל---ctr-num, אותו זהב שבו מוצג המספר
+   במונה. במצב בהיר הם נשארים --gold-deep.
+   ============================================================ */
+[data-theme="dark"] .hero__verse .verse-em,
+[data-theme="dark"] .hero__source { color: var(--ctr-num); }
+
+[data-theme="dark"] .search__submit { background: var(--ctr-num); }
+/* חייב להיות מפורש: ל---submit:hover ול-[data-theme] .search__submit יש
+   אותה ספציפיות בדיוק, וסדר המקור היה מבטל את הריחוף. */
+[data-theme="dark"] .search__submit:hover { background: var(--ink); }
+
+.search__panel {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + 10px);
+  /* חייב לגבור על .topbar (40) — ל-.search אין הקשר ערימה משלו. */
+  z-index: 45;
+  max-height: min(60vh, 460px);
+  overflow-y: auto;
+  /* overflow-y:auto מחשב את overflow-x ל-auto, והפאנל נגלל הצידה במגע. */
+  overflow-x: hidden;
+  padding: 6px;
+  margin: 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-royal);
+}
+.search__panel[hidden] { display: none; }
+
+.search__option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border-radius: var(--r-tile);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+.search__option:hover,
+.search__option.is-active { background: var(--gold-veil); }
+
+.search__badge {
+  flex: none;
+  padding: 3px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.search__badge--category { color: var(--gold-deep); }
+.search__badge--question { color: var(--cat-tefila); }
+
+/* הכותרת והכתובית הן <span>. בלי display:block הן זורמות באותה שורה בלי
+   רווח ("...מדי כמה שנים?מזוזה וסת\"ם"), ובנוסף text-overflow ו-margin-top
+   לא חלים כלל על תיבה inline. */
+.search__text {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.search__title {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.search__meta {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: var(--ink-muted);
+}
+.search__number {
+  flex: none;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  font-feature-settings: "tnum";
+}
+
+.search__empty { padding: 18px 14px; text-align: center; color: var(--ink-muted); font-size: 14.5px; }
+
+/* בנייד הגובה נגזר מהשטח שנשאר מעל המקלדת ולא מגובה ה-layout viewport —
+   בלי זה הרשימה כולה נופלת מתחת למקלדת ואף הצעה אינה נראית. */
+@media (max-width: 860px) {
+  .search__panel { max-height: min(var(--search-max, 46vh), 340px); }
+}
+
+/* ============================================================
+   מקטעים
+   ============================================================ */
+.section { padding: 54px 0; }
+.section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.section__title {
+  font-size: clamp(22px, 2.6vw, 28px);
+  font-weight: 700;
+}
+.section__title--sub {
+  font-size: clamp(25px, 2.6vw, 28px);
+  margin-bottom: 14px;
+}
+
+/* כותרות עבריות קצרות נשברות ליתומות. לא נוגע ב-.question-card__title
+   הבסיסי, כדי לא להתקרב לגבול של חוזה design-reference.html. */
+.post-header__title,
+.prose h2,
+.prose h3,
+.section__title--sub { text-wrap: balance; }
+
+.section__head--spaced { margin-top: 26px; }
+.eyebrow--centered { text-align: center; margin-top: 26px; }
+
+.section__link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gold-deep);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.section__link:hover { text-decoration: underline; }
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: var(--gold-deep);
+  margin: 0 0 10px;
+}
+
+/* ============================================================
+   רכיב 1 — QuestionCard  (מ-design-reference.html)
+   שלושת הדברים שאסור "לתקן": ההטיה, המשקל, המידה הצרה.
+   ============================================================ */
+.question-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 44px 28px 48px;   /* המרווח הצדדי חייב להישאר — הפינות המסובבות חורגות */
+  text-align: center;
+  overflow: visible;
+  margin-inline: auto;
+}
+
+.question-card__badge {
+  display: inline-block;
+  transform: rotate(-2.5deg);
+  border: 2px solid var(--rule-strong);
+  border-radius: 4px;
+  padding: 9px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;          /* בלי זה הספרות נוגעות במסגרת ונראות חתוכות */
+  letter-spacing: 0.02em;
+  font-feature-settings: "tnum";
+}
+
+.question-card__title {
+  margin: 28px auto 0;
+  max-width: 240px;          /* מכריח שבירה ל-3–4 שורות. אל תגדיל. */
+  font-family: var(--font-serif);
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+}
+
+/* ה-440px מעתיק את ערך ה-inline שהיה בתבנית, כדי שהדסקטופ לא יזוז.
+   בנייד המידה מצטמצמת לכיוון 240px של הרפרנס — מתקרבת לחוזה, לא מתרחקת. */
+.question-card__title--page {
+  max-width: 440px;
+  font-size: clamp(28px, 4.6vw, 42px);
+}
+
+@media (max-width: 640px) {
+  .question-card__title--page {
+    max-width: 300px;
+    font-size: clamp(29px, 8.6vw, 42px);
+  }
+}
+
+.question-card__link {
+  display: inline-block;
+  margin-top: 26px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--gold-deep);
+}
+
+/* ============================================================
+   רכיב 2 — רשת הקטגוריות המלכותית  (מ-DDD2/category-grid-royal.html)
+   מסגרת כפולה, יהלומי פינה, טבעות זהב סביב האייקונים והבזק זהב במעבר.
+   הפינות כמעט חדות (2px) בכוונה — 12px היו קוראים כאפליקציה, לא כדף.
+   המידות מגיעות מגרסת DDD2: פאנל רחב (1120px) ואריחים גדולים —
+   minmax(300px), ריפוד 19/20, אייקון 38px. הגרסה הקודמת הייתה צרה (760px)
+   ואריחיה חצי מזה. אל תחזיר את המידות הישנות.
+   ============================================================ */
+
+/* מפריד עם מעוין נושם */
+.cat-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.cat-divider span {
+  height: .5px;
+  background: var(--line-soft);
+  flex: 1;
+}
+.cat-divider i {
+  width: 8px;
+  height: 8px;
+  background: var(--gold-royal);
+  transform: rotate(45deg);
+  animation: cat-breathe 4.5s ease-in-out infinite;
+}
+
+@keyframes cat-breathe {
+  0%, 100% { opacity: .45; transform: rotate(45deg) scale(1); }
+  50%      { opacity: 1;   transform: rotate(45deg) scale(1.25); }
+}
+
+/* הפאנל */
+.cat-panel {
+  position: relative;
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  /* קובץ המקור נקב ב-2px ("פינות כמעט חדות"), אבל התבקשו פינות עגולות.
+     משתמשים בטוקני הרדיוס של האתר במקום במספר חדש, כך שהרשת מתיישרת עם
+     שאר הכרטיסים במקום להמציא סקאלה שלישית. */
+  border-radius: var(--r-card);
+  padding: 36px 34px;
+}
+
+/* המסגרת הפנימית מוסטת 5px פנימה, ולכן הרדיוס שלה חייב להיות קטן באותם
+   5px — אחרת שני הקווים לא קונצנטריים והפער ביניהם משתנה לאורך הקשת. */
+.cat-panel::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: .5px solid var(--line-soft);
+  border-radius: calc(var(--r-card) - 5px);
+  pointer-events: none;
+}
+
+/* יהלומי הפינה. על פינה חדה הם ישבו על הקודקוד עצמו (‎-4px); על קשת
+   הקודקוד כבר לא קיים, והם היו נשארים מרחפים מחוץ למסגרת. הנקודה הקרובה
+   ביותר של קשת ברדיוס r לפינת התיבה נמצאת ב-r(1-1/√2) ≈ 0.2929r פנימה,
+   ושם מונח מרכז המעוין — לכן ההיסט הוא אותו ערך פחות חצי מרוחבו.
+   נגזר מהרדיוס ולא מוקשח, כדי שהשניים לא ייפרדו בשינוי הבא. */
+.cat-panel__corner {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: var(--gold-royal);
+  transform: rotate(45deg);
+  --corner-offset: calc(var(--r-card) * 0.2929 - 3.5px);
+}
+.cat-panel__corner--tr { top: var(--corner-offset); inset-inline-end: var(--corner-offset); }
+.cat-panel__corner--tl { top: var(--corner-offset); inset-inline-start: var(--corner-offset); }
+.cat-panel__corner--br { bottom: var(--corner-offset); inset-inline-end: var(--corner-offset); }
+.cat-panel__corner--bl { bottom: var(--corner-offset); inset-inline-start: var(--corner-offset); }
+
+.cat-panel__head { text-align: center; margin-bottom: 22px; }
+
+.cat-panel__eyebrow {
+  font-size: 11px;
+  letter-spacing: .32em;
+  color: var(--gold-royal);
+  margin-bottom: 6px;
+}
+
+.cat-panel__title {
+  font-family: var(--font-serif);
+  font-size: 25px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.cat-tile {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 19px 20px;
+  /* המילוי האפור הוא מה שהוזיל את הגרסה הקודמת. */
+  background: transparent;
+  border: .5px solid var(--line-tile);
+  border-radius: var(--r-tile);
+  text-decoration: none;
+  color: inherit;
+  opacity: 0;
+  animation: cat-rise .5s ease-out forwards;
+  animation-delay: calc(var(--i, 0) * 55ms);
+  transition: border-color .35s, background .35s, transform .35s;
+}
+
+.cat-tile:hover,
+.cat-tile:focus-visible {
+  border-color: var(--gold-royal);
+  background: var(--tile-hover);
+  transform: translateY(-2px);
+}
+
+@keyframes cat-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* הבזק הזהב — הפרט שקונה את תחושת היוקרה */
+.cat-tile::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  inset-inline-end: -60%;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, var(--shimmer), transparent);
+  transform: skewX(-18deg);
+  transition: inset-inline-end .55s ease;
+}
+
+.cat-tile:hover::after { inset-inline-end: 120%; }
+
+.cat-tile__icon {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: .5px solid var(--gold-ring);
+  border-radius: 50%;
+  color: var(--gold-ink);
+}
+
+.cat-tile__icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* display:block חובה — שניהם <span>, ובלעדיו הם זורמים באותה שורה בלי
+   רווח ("שבת10 שאלות"), בדיוק כמו הבאג שהיה בתוצאות החיפוש. */
+.cat-tile__name {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.cat-tile__count {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-top: 3px;
+}
+
+/* בלי זה האריחים נשארים ב-opacity:0 למי שכיבה אנימציות. */
+@media (prefers-reduced-motion: reduce) {
+  .cat-tile, .cat-divider i { animation: none; opacity: 1; }
+  .cat-tile, .cat-tile::after { transition: none; }
+}
+
+/* קובץ ההתייחסות מגדיר רק דסקטופ. שלוש המדרגות למטה הן תוספת שלנו,
+   וכל אחת יושבת בדיוק בנקודה שבה השורה הקודמת קורסת לטור אחד.
+
+   minmax(300px)+gap:14 דורש 614px של רשת = 682px בתוך ה-wrap = 722px מסך.
+   מתחת לזה 10 האריחים היו נמתחים לטור אחד ארוך — ולכן המדרגה ב-760px. */
+@media (max-width: 760px) {
+  .cat-panel { padding: 30px 26px; }
+  .cat-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .cat-tile { padding: 16px 16px; gap: 13px; }
+  .cat-tile__icon { width: 34px; height: 34px; }
+  .cat-tile__icon svg { width: 18px; height: 18px; }
+}
+
+/* בטלפון auto-fit כבר לא עוזר: ב-390px נשארים 322px בתוך הפאנל, ו-minmax
+   כלשהו שנותן שתי עמודות שם ייתן שלוש ב-560px. שתי עמודות מפורשות
+   מתנהגות אותו דבר לכל רוחב מסך. */
+@media (max-width: 560px) {
+  .cat-panel { padding: 18px 14px; }
+  .cat-panel__head { margin-bottom: 16px; }
+  .cat-panel__title { font-size: 22px; }
+  .cat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .cat-tile { padding: 12px 11px; gap: 10px; }
+  .cat-tile__icon { width: 28px; height: 28px; }
+  .cat-tile__icon svg { width: 15px; height: 15px; }
+  .cat-tile__name { font-size: 14px; }
+  .cat-tile__count { font-size: 12px; margin-top: 1px; }
+  .cat-divider { margin-bottom: 16px; }
+}
+
+@media (max-width: 340px) {
+  .cat-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   אקורדיון השאלות בעמוד הקטגוריה
+   ============================================================ */
+.qa-list {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-royal);
+}
+
+.qa-item { border-bottom: 1px solid var(--rule); }
+.qa-item:last-child { border-bottom: 0; }
+
+.qa-item__summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  cursor: pointer;
+  list-style: none;
+  transition: background-color .15s ease;
+}
+.qa-item__summary::-webkit-details-marker { display: none; }
+.qa-item__summary:hover { background: var(--gold-veil); }
+
+.qa-item__number {
+  flex: none;
+  min-width: 52px;
+  padding: 3px 8px;
+  border: 1.5px solid var(--rule-strong);
+  border-radius: 4px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  font-feature-settings: "tnum";
+  transform: rotate(-2.5deg);
+  margin-top: 2px;
+}
+
+.qa-item__question {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.qa-item__chevron {
+  flex: none;
+  width: 18px; height: 18px;
+  margin-top: 5px;
+  color: var(--ink-muted);
+  transition: transform .2s ease;
+}
+.qa-item[open] .qa-item__chevron { transform: rotate(180deg); }
+
+.qa-item__body {
+  padding: 0 20px 20px;
+  margin-inline-start: 66px;
+}
+@media (max-width: 560px) {
+  .qa-item__body { margin-inline-start: 0; }
+}
+
+/* ============================================================
+   תשובה ישירה — הרכיב הבולט ביותר בעמוד השאלה
+   ============================================================ */
+/* ============================================================
+   שיתוף והעתקה בעמוד שאלה
+   ============================================================ */
+/* מוסתר עד שה-JS מסמן has-js על השורש — כפתור העתקה בלי JS הוא כפתור מת. */
+.js-only { display: none; }
+.has-js .js-only { display: inline-flex; }
+/* hidden חייב לגבור על ה-display שלמעלה, אחרת כפתור השיתוף היה מוצג
+   גם בדפדפן בלי Web Share API. */
+.has-js .js-only[hidden] { display: none; }
+
+.qa-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* אייקון בלבד. 42px ולא קטן יותר — זהו יעד המגע, ומתחת ל-40px הוא נופל
+   מתחת למינימום של WCAG 2.2. השם הנגיש מגיע מ-aria-label בתבנית. */
+.qa-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+.qa-action svg { width: 19px; height: 19px; flex: none; }
+.qa-action:hover { border-color: var(--gold); background: var(--gold-veil); }
+
+/* ירוק הוואטסאפ הוא זיהוי המותג שלו ולכן קבוע ולא נגזר מטוקני הערכה.
+   #128C7E על לבן נותן 4.6:1 — עובר AA. */
+.qa-action--wa { color: #128C7E; }
+.qa-action--wa:hover { border-color: #128C7E; background: rgba(18, 140, 126, .08); }
+[data-theme="dark"] .qa-action--wa { color: #4FBF97; }
+
+/* החלפת האייקון בווי — המשוב היחיד שנשאר אחרי שהתוויות ירדו. */
+.qa-action__check { display: none; }
+.qa-action.is-done .qa-action__icon,
+.qa-action.is-failed .qa-action__icon { display: none; }
+.qa-action.is-done .qa-action__check { display: block; }
+
+.qa-action.is-done {
+  border-color: var(--gold);
+  background: var(--gold-veil);
+  color: var(--gold-deep);
+}
+/* כשל: מסגרת בלבד, בלי אייקון מטעה. ההודעה נמסרת ב-status. */
+.qa-action.is-failed { border-color: var(--cat-shabbat); }
+
+/* ============================================================
+   ניווט בין שאלות
+   ============================================================ */
+.qa-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.qa-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-tile);
+  background: var(--surface);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.qa-nav__link:hover { border-color: var(--gold); background: var(--gold-veil); }
+/* "הבאה" מיושרת לקצה השני, כך שהזוג נקרא כשני קצוות של ציר. */
+.qa-nav__link--next { text-align: end; }
+
+.qa-nav__dir {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  color: var(--gold-deep);
+}
+.qa-nav__link--next .qa-nav__dir { justify-content: flex-end; }
+.qa-nav__dir svg { width: 15px; height: 15px; flex: none; }
+
+.qa-nav__title {
+  font-family: var(--font-serif);
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  /* שתי שורות לכל היותר — שאלה ארוכה הייתה מנפחת כרטיס אחד מול השני. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .qa-nav { grid-template-columns: 1fr; }
+}
+
+.answer-direct {
+  position: relative;
+  padding: 22px 26px;
+  background: var(--gold-veil);
+  border: 1px solid var(--gold);
+  border-radius: var(--r-card);
+  font-family: var(--font-serif);
+  font-size: clamp(19px, 2.4vw, 24px);
+  font-weight: 700;
+  line-height: 1.45;
+}
+.answer-direct__label {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: var(--gold-deep);
+  margin-bottom: 9px;
+}
+
+.prose {
+  max-width: var(--measure);
+  font-size: 17px;
+  line-height: 1.85;
+}
+.prose h2 {
+  font-size: 24px;
+  margin: 1.7em 0 .6em;
+}
+.prose h3 { font-size: 19px; margin: 1.5em 0 .5em; }
+.prose ul, .prose ol { padding-inline-start: 1.4em; margin: 0 0 1em; }
+.prose li { margin-bottom: .4em; }
+.prose a { color: var(--gold-deep); }
+.prose blockquote {
+  margin: 1.4em 0;
+  padding-inline-start: 18px;
+  border-inline-start: 3px solid var(--gold);
+  color: var(--ink-muted);
+  font-family: var(--font-serif);
+}
+.prose code {
+  background: var(--surface-soft);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: .9em;
+}
+
+/* ============================================================
+   כרטיסים כלליים
+   ============================================================ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-card);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-royal);
+}
+.card__title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.panel-list { list-style: none; margin: 0; padding: 0; }
+.panel-list li {
+  display: flex;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 15px;
+}
+.panel-list li:last-child { border-bottom: 0; }
+
+.source-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.source-list li {
+  padding: 6px 13px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  font-size: 13.5px;
+  font-family: var(--font-serif);
+}
+
+.minhag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+.minhag {
+  padding: 16px 18px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-tile);
+  background: var(--surface-soft);
+}
+.minhag__label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  color: var(--gold-deep);
+  margin-bottom: 7px;
+}
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink-muted);
+  margin-bottom: 20px;
+}
+.breadcrumbs a { text-decoration: none; }
+.breadcrumbs a:hover { text-decoration: underline; }
+.breadcrumbs__sep { opacity: .5; }
+
+.category-intro {
+  margin-top: 12px;
+  font-size: 17px;
+  color: var(--ink-muted);
+  max-width: 60ch;
+}
+.category-tags { margin-top: 20px; }
+
+/* התו ← (U+2190) יושב בתת-קבוצת math של Heebo, ובגללו הדפדפן מוריד שני
+   קבצי woff2 נוספים (math ~23.7KB ו-symbols ~14.2KB) — 37KB בשביל שני
+   חצים דקורטיביים. הוצאת התו מהמשפחה מייתרת אותם. */
+.arrow-glyph {
+  font-family: system-ui, "Segoe UI Symbol", sans-serif;
+  font-weight: inherit;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.button:hover { background: var(--ink); color: var(--paper); }
+.button--gold { border-color: var(--gold); color: var(--gold-deep); }
+.button--gold:hover { background: var(--gold); color: var(--paper); }
+
+.disclaimer {
+  margin-top: 26px;
+  padding: 16px 20px;
+  border: 1px dashed var(--gold);
+  border-radius: var(--r-tile);
+  background: var(--gold-veil);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   זמנים
+   ============================================================ */
+/* 150px ולא 170px: בטלפון של 390px נשארים 350px אחרי הריפוד, ושתי עמודות
+   של 170 + מרווח כבר לא נכנסות — הרשת הייתה נופלת לעמודה אחת. */
+.zman-hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+.zman-hero__item {
+  padding: 20px 18px;
+  border: 1px solid var(--gold);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  text-align: center;
+  box-shadow: var(--shadow-royal);
+}
+.zman-hero__label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+}
+.zman-hero__value {
+  font-family: var(--font-serif);
+  font-size: 33px;
+  font-weight: 700;
+  font-feature-settings: "tnum";
+  line-height: 1;
+}
+.zman-hero__note { font-size: 12px; color: var(--ink-muted); margin-top: 8px; }
+
+.zman-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.zman-table th,
+.zman-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--rule);
+  text-align: start;
+}
+.zman-table thead th {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--gold-deep);
+  border-bottom: 2px solid var(--gold);
+}
+.zman-table tbody tr:last-child td { border-bottom: 0; }
+.zman-table tbody tr:hover { background: var(--gold-veil); }
+.zman-table__time {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 17px;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}
+.zman-table__note { color: var(--ink-muted); font-size: 13px; }
+.zman-table tr[data-primary="1"] .zman-table__label { font-weight: 700; }
+
+.table-scroll { overflow-x: auto; }
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field__label { font-size: 12.5px; font-weight: 500; color: var(--ink-muted); }
+.field select,
+.field input {
+  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-tile);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  min-width: 170px;
+}
+
+.beracha-sticky { margin-bottom: 16px; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 6px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.chip:hover { border-color: var(--gold); }
+.chip[aria-pressed="true"] {
+  background: var(--gold-veil);
+  border-color: var(--gold);
+  color: var(--gold-deep);
+  font-weight: 700;
+}
+.chip--holiday {
+  background: var(--gold-veil);
+  border-color: var(--gold);
+  color: var(--gold-deep);
+  font-weight: 500;
+  cursor: default;
+}
+
+/* ============================================================
+   מה נברך
+   ============================================================ */
+.beracha-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.beracha-table th,
+.beracha-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--rule);
+  text-align: start;
+  vertical-align: top;
+}
+/* בלי sticky: המיכל העוטף הוא scrollport בגלל overflow-x, וכותרת דביקה
+   בתוכו מתנתקת מהמסגרת התחתונה שלה ומשאירה רצועה ריקה. */
+.beracha-table thead th {
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--gold-deep);
+  border-bottom: 2px solid var(--gold);
+  white-space: nowrap;
+}
+.beracha-table__name { font-weight: 500; }
+.beracha-table__note { font-size: 13px; color: var(--ink-muted); margin-top: 3px; }
+.beracha-table tbody tr:hover { background: var(--gold-veil); }
+.beracha-table tr[hidden] { display: none; }
+
+.tag {
+  display: inline-block;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: var(--surface-soft);
+  border: 1px solid var(--rule);
+}
+
+.blessing-card {
+  border: 1px solid var(--rule);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  padding: 20px 22px;
+}
+.blessing-card__title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: var(--gold-deep);
+  margin-bottom: 10px;
+}
+.blessing-card__text {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 2;
+  font-weight: 500;
+}
+.blessing-card__when { font-size: 13.5px; color: var(--ink-muted); margin-top: 12px; }
+
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* ============================================================
+   בלוג
+   ============================================================ */
+.post-list { display: grid; gap: 16px; }
+.post-card {
+  display: block;
+  padding: 24px 26px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-card);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .15s ease;
+  box-shadow: var(--shadow-royal);
+}
+.post-card:hover { border-color: var(--gold); }
+.post-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  margin-bottom: 10px;
+}
+.post-card__title { font-size: 23px; font-weight: 700; margin-bottom: 8px; }
+.post-card__desc { font-size: 15px; color: var(--ink-muted); }
+
+.post-header { text-align: center; padding: 40px 0 8px; }
+.post-header__title {
+  font-size: clamp(28px, 4.4vw, 44px);
+  font-weight: 700;
+  max-width: 20ch;
+  margin: 14px auto 0;
+}
+
+/* ============================================================
+   פוטר
+   ============================================================ */
+/* ============================================================
+   הרצועה שמעל הפוטר — פרשת השבוע וכניסת השבת
+   ============================================================ */
+/* צבע קבוע ולא --ink: הרצועה שחורה בשתי הערכות בכוונה, והיא הדבר היחיד
+   באתר שלא מתהפך. לכן גם הטקסט שעליה קבוע ולא נגזר מטוקני הערכה. */
+.ribbon {
+  margin-top: auto;          /* דוחף את הרצועה+פוטר לתחתית בעמוד קצר */
+  background: #14140F;
+  color: #F0EEE6;
+  border-top: 1px solid var(--gold);
+}
+
+.ribbon__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 28px;
+  padding-block: 13px;
+}
+
+.ribbon__item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  min-width: 0;
+}
+/* דוחף את הפריט השני לקצה גם כשהראשון חסר (שבת שאין בה פרשה). */
+.ribbon__item--end { margin-inline-start: auto; }
+
+.ribbon__label {
+  flex: none;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  /* #B8912E על #14140F נותן 5.6:1 — עובר AA גם בגודל הזה. */
+  color: #B8912E;
+}
+
+.ribbon__value {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.ribbon__value--num { font-feature-settings: "tnum"; }
+
+@media (max-width: 560px) {
+  /* בטלפון שתי הפריטים לא נכנסים בשורה — עמודה אחת, ובלי ה-auto שדוחף
+     את השני לקצה, אחרת הוא נשאר תלוי בצד. */
+  .ribbon__inner { flex-direction: column; align-items: stretch; gap: 8px; }
+  .ribbon__item { justify-content: space-between; }
+  .ribbon__item--end { margin-inline-start: 0; }
+  .ribbon__value { font-size: 15px; }
+}
+
+/* ============================================================
+   פוטר
+   ============================================================ */
+.footer {
+  padding: 48px 0 34px;
+  border-top: 1px solid var(--rule);
+  background: var(--surface);
+}
+/* מסלולים מפורשים בלבד. אסור לערבב repeat(auto-fit) עם מסלול fr באותה
+   רשימה — זו רשימה פסולה, הדפדפן זורק את כל ההצהרה ונשאר עם עמודה אחת.
+   שתי עמודות ולא ארבע: טורי "האתר" ו"כלים" ירדו לטובת שורת העמודים
+   הממורכזת שמתחת. `auto` בטור השני ולא `1fr` — עם fr הטור נמתח לרבע
+   הרוחב והרשימה נצמדת לימינו, כך שהקצה השמאלי נשאר ריק. */
+/* מותג | האתר | נושאים.
+   שלושתן ב-fr ולא `auto`: עם auto עמודות הקישורים מתכווצות לרוחב הטקסט,
+   וכל העודף מצטבר לחור אחד בין המותג להן — 260px ריקים מצד אחד ושתי
+   עמודות דחוקות מהצד השני. ב-fr העודף מתחלק שווה בשווה.
+   1.35fr למותג כי הוא חסום ב-38ch; טור רחב יותר היה מחזיר את החור. */
+.footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 56px;
+  row-gap: 32px;
+  margin-bottom: 30px;
+  align-items: start;
+}
+
+/* הקו האנכי שלפני כל עמודת קישורים. ב-RTL inline-start הוא הצד הימני של
+   הבלוק — כלומר בדיוק בין העמודות. הריפוד שווה למרווח, כך שהקו יושב
+   באמצע המרווח ולא נצמד לאחד הצדדים. */
+.footer__col {
+  border-inline-start: 1px solid var(--rule);
+  padding-inline-start: 44px;
+  min-width: 0;
+}
+
+/* העמוד הפעיל מסומן בזהב גם בפוטר, כמו בסרגל העליון. */
+.footer__links a[aria-current="page"] { color: var(--gold-deep); font-weight: 500; }
+
+.footer__brand { max-width: 38ch; }
+
+.footer__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.footer__logo svg { width: 30px; height: 30px; flex: none; color: var(--gold); }
+.footer__logo span {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.footer__title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  color: var(--gold-deep);
+  margin-bottom: 14px;
+}
+/* טור בודד של קישורים מוערמים. */
+.footer__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.footer__links a {
+  display: inline-block;
+  padding-block: 6px;
+  font-size: 14.5px;
+  text-decoration: none;
+  color: var(--ink-muted);
+  transition: color .15s ease;
+}
+.footer__links a:hover { color: var(--ink); }
+
+.footer__verse {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.95;
+  color: var(--ink-muted);
+  margin: 0;
+}
+.footer__source {
+  margin: 10px 0 0;
+  font-size: 12px;
+  letter-spacing: .12em;
+  color: var(--gold-deep);
+}
+
+.footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rule);
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+/* ============================================================
+   עמוד 404 ומצבים ריקים
+   ============================================================ */
+.empty {
+  text-align: center;
+  padding: 70px 20px;
+}
+.empty__title { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+.empty__text { color: var(--ink-muted); margin-bottom: 24px; }
+
+/* ============================================================
+   מובייל
+   שלוש מדרגות: טאבלט (900), טלפון (640) וטלפון צר (400).
+   ============================================================ */
+
+/* בטאבלט: עמודה אחת. הכלל הקודם פרס שלוש עמודות עבור שלוש רשימות קישורים
+   שכבר אינן קיימות — היום נשארו מותג ונושאים בלבד, ושלוש עמודות היו
+   משאירות שני מסלולים ריקים. */
+/* בטאבלט המותג עובר לשורה משלו ושתי עמודות הקישורים נשארות זו לצד זו —
+   הקו האנכי ביניהן נשמר, ומעל שתיהן נמתח קו אופקי שמפריד מהמותג. */
+@media (max-width: 900px) {
+  .footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 34px;
+  }
+  .footer__brand { max-width: none; grid-column: 1 / -1; }
+  .footer__col {
+    border-top: 1px solid var(--rule);
+    padding-top: 24px;
+  }
+  /* הראשונה מבין השתיים לא צריכה קו אנכי — אין לה שכנה מימין. */
+  .footer__col:nth-of-type(1) {
+    border-inline-start: 0;
+    padding-inline-start: 0;
+  }
+  .footer__col:nth-of-type(2) { padding-inline-start: 34px; }
+}
+
+@media (max-width: 640px) {
+  .wrap { padding-inline: 16px; }
+
+  /* 56 min-height + גבול 1 + פס הזהב 2 = 59. הכותרת דביקה, ולכן כל פיקסל
+     כאן נגרע מכל מסך גלילה. 44px של יעד מגע נכנסים עם 6px אוויר. */
+  :root { --topbar-h: 59px; }
+  .topbar__inner { min-height: 56px; gap: 12px; }
+
+  .hero { padding: 24px 0 22px; }
+  .hero__crown { width: 30px; height: 30px; margin-bottom: 12px; }
+  .hero__verse { line-height: 1.7; max-width: 17ch; }
+  .hero__source { margin-top: 10px; }
+  /* בטלפון הקווים הנמתחים (74px כל אחד) גוזלים 148px מרוחב שכבר צר,
+     והקפסולה נדחסת. מורידים אותם ומקטינים את הריפוד. */
+  .counter { margin-top: 18px; gap: 9px; }
+  .counter__rule { display: none; }
+  .counter__pill { padding: 10px 20px; }
+  .counter__typer { top: 10px; inset-inline-end: 20px; }
+  .counter__line { font-size: 15px; }
+  .counter__num { font-size: 19px; }
+  .search { margin-top: 16px; }
+  .search__field { padding-inline: 16px; }
+  .search__input { padding-block: 14px; }
+
+  /* המקטעים כבר מופרדים בעיטור זהב — 36px למעלה ולמטה הם מפריד כפול. */
+  .section { padding: 26px 0; }
+  .section__head { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .section__head--spaced,
+  .eyebrow--centered { margin-top: 14px; }
+  .eyebrow { margin-bottom: 6px; }
+
+  .grid-cards { grid-template-columns: 1fr 1fr; gap: 12px; }
+  /* כרטיס זמני השבת הוא היחיד עם מידע תלוי-זמן — נשאר ברוחב מלא. */
+  .grid-cards > .card:first-child { grid-column: 1 / -1; }
+  .grid-cards .card p { font-size: 13.5px; line-height: 1.55; }
+  .grid-cards .button {
+    width: 100%;
+    justify-content: center;
+    padding-inline: 10px;
+    font-size: 13.5px;
+  }
+
+  /* הכותרת נשארת צרה כמו ברפרנס; רק גודל הגופן מתרכך כדי שלא ייווצרו
+     שש שורות של 42px במסך צר. */
+  .question-card { padding: 16px 8px 20px; }
+  .question-card__title { font-size: clamp(29px, 8.6vw, 42px); margin-top: 18px; }
+  .question-card__link { margin-top: 18px; }
+
+  .qa-item__summary { padding: 14px 12px; gap: 10px; }
+  .qa-item__number { min-width: 32px; padding: 3px 6px; font-size: 12px; }
+  /* המילה "שאלה" חוזרת עשר פעמים ברשימה ולא מוסיפה מידע. המספר לבדו על
+     המסך, והמילה נשארת לקורא מסך. 32px עדיין מכיל מספר תלת-ספרתי. */
+  .qa-item__number-word {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+  .qa-item__question { font-size: 16.5px; }
+  .qa-item__body { padding: 0 12px 18px; }
+
+  .category-intro { font-size: 15.5px; margin-top: 10px; }
+  .category-tags { margin-top: 14px; }
+
+  /* flex-wrap מתנוון לטור אחד ממילא (אף שני פריטים לא נכנסים יחד ב-358px),
+     ומקור בן 67 תווים נשבר לשתי שורות בתוך גלולה — נראה כלוזנג' מרוצף. */
+  .source-list { display: block; }
+  .source-list li {
+    border-radius: var(--r-tile);
+    padding: 9px 14px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .source-list li + li { margin-top: 8px; }
+
+  /* clamp(19px, 2.4vw, 24px) חוצה את 19px רק ברוחב 792px, ולכן "הרכיב
+     הבולט ביותר בעמוד" היה 19px בכל טלפון וטאבלט. */
+  .answer-direct { padding: 20px 18px; font-size: 20.5px; line-height: 1.55; }
+  .card { padding: 16px; }
+  .minhag p { font-size: 17px; line-height: 1.7; }
+  .disclaimer { font-size: 15px; line-height: 1.65; }
+
+  /* 16.5px ב-line-height 1.85 הוא leading של שורה בת 70-80 תווים, אבל
+     השורה בפועל היא 44-48 תווים — והמרווח בין פסקאות היה 0.54 שורה בלבד,
+     כך שהפסקאות נדבקו זו לזו והמקטע נראה כקיר. */
+  .prose { font-size: 17px; line-height: 1.7; }
+  .prose p { margin-bottom: 1.3em; }
+  .prose li { margin-bottom: .8em; }
+  .prose li::marker { color: var(--gold); }
+
+  /* ההיררכיה נבנית ממרווח וקו-שיער ולא מגודל בלבד — h1:h2 היה 1.17 בפוסט. */
+  .prose h2 {
+    font-size: 21px;
+    margin: 1.9em 0 .5em;
+    padding-top: .75em;
+    border-top: 1px solid var(--rule);
+  }
+  .prose > h2:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+  .prose h3 { font-size: 18px; margin: 1.6em 0 .4em; }
+  .post-header__title { font-size: clamp(30px, 8vw, 44px); }
+
+  /* הפוטר בנייד היה 880px — יותר ממסך שלם. עכשיו: המותג למעלה, הנושאים
+     כשורת תגיות נגללת במקום קישורים מוערמים, ושורת העמודים במרכז. */
+  .footer { padding: 28px 0 20px; }
+  .footer__grid {
+    column-gap: 18px;
+    row-gap: 22px;
+    margin-bottom: 22px;
+  }
+  .footer__logo { margin-bottom: 10px; }
+  .footer__logo svg { width: 26px; height: 26px; }
+  .footer__logo span { font-size: 18px; }
+  .footer__verse { font-size: 13.5px; line-height: 1.75; }
+  .footer__source { margin-top: 6px; font-size: 11.5px; }
+
+  .footer__title { margin-bottom: 10px; font-size: 11px; }
+  .footer__links a { font-size: 14px; padding-block: 7px; }
+  /* שתי העמודות נשארות זו לצד זו גם ב-390px: נשארים שם ~160px לכל אחת,
+     ו"יום הכיפורים" עדיין נכנס בשורה אחת. */
+  .footer__col { padding-top: 20px; }
+  .footer__col:nth-of-type(2) { padding-inline-start: 18px; }
+
+  .footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding-top: 16px;
+    font-size: 12.5px;
+  }
+
+  /* טבלאות: במסך צר גלילה אופקית של טבלת זמנים היא חוויה גרועה, ולכן
+     כל שורה נפרסת לשורה משלה במקום להישאר טבלה רחבה. */
+  .zman-table thead { display: none; }
+  .zman-table, .zman-table tbody, .zman-table tr, .zman-table td { display: block; }
+  /* היה 1fr auto: התווית נדבקה לקצה ההתחלה והשעה לקצה הסיום, ובין קצה
+     הטקסט לשעה נמדדו 136–215px של חלל לבן בלי קו מוביל — 16 קפיצות עין
+     בטבלת "כל זמני היום". עכשיו השעות יוצרות עמודה כמו בלוח יציאות.
+     שינוי ויזואלי בלבד: סדר ה-DOM ותגי <time datetime> לא נגעו. */
+  .zman-table tr {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-areas:
+      "time label"
+      "time note";
+    column-gap: 14px;
+    align-items: baseline;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .zman-table tr:last-child { border-bottom: 0; }
+  .zman-table td { border: 0; padding: 0; }
+  .zman-table__time { grid-area: time; }
+  .zman-table__label { grid-area: label; }
+  .zman-table__note { grid-area: note; margin-top: 3px; }
+
+  .beracha-table thead { display: none; }
+  .beracha-table, .beracha-table tbody, .beracha-table tr, .beracha-table td { display: block; }
+  .beracha-table tr {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 14px;
+    row-gap: 8px;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+    /* 140 שורות בטור אחד. בלי זה כל reflow עולה ~145ms בטלפון וניקוי
+       המסנן תוקע ~90ms. נמדד אחרי: 55ms ו-13ms. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 74px;
+  }
+  .beracha-table tr[hidden] { display: none; }
+  .beracha-table td { border: 0; padding: 0; }
+  .beracha-table td:nth-child(1) { grid-column: 1 / -1; }
+
+  /* ה-thead מוסתר בנייד, ולכן שני התגים הופיעו זהים במראה בלי לומר
+     מי הברכה הראשונה ומי האחרונה — אבידת מידע מול הדסקטופ. */
+  .beracha-table td:nth-child(2),
+  .beracha-table td:nth-child(3) {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .beracha-table td:nth-child(2)::before { content: "ראשונה"; }
+  .beracha-table td:nth-child(3)::before { content: "אחרונה"; }
+  .beracha-table td:nth-child(2)::before,
+  .beracha-table td:nth-child(3)::before {
+    flex: none;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    color: var(--gold-deep);
+  }
+  .beracha-table td:nth-child(4) { display: none; }  /* הקבוצה כבר בצ'יפים */
+
+  /* עיר ותאריך זה לצד זה בעמוד הזמנים, הכפתור בשורה משלו: 213px→127px.
+     .controls משמש גם ב"מה נברך", ושם יש שדה יחיד — בלי :only-child
+     הרשת מכווצת אותו מ-358px ל-240px. */
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 12px;
+    align-items: end;
+  }
+  .controls > .field:only-child { grid-column: 1 / -1; }
+  .field, .field select, .field input { width: 100%; min-width: 0; }
+  .controls .button { grid-column: 1 / -1; width: 100%; justify-content: center; }
+  /* 16px ולא 15px: ספארי בנייד מזום כל שדה מתחת ל-16px ואינו מחזיר. */
+  .field select, .field input { font-size: 16px; }
+
+  /* הטבלה היא ~14,500px. בלי דביקות, שינוי חיפוש מהאמצע מחייב גלילה חזרה. */
+  .beracha-sticky {
+    position: sticky;
+    top: var(--topbar-h);
+    z-index: 20;
+    margin-inline: -16px;
+    margin-bottom: 0;
+    padding: 10px 16px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+  }
+  .beracha-sticky .controls { margin-bottom: 10px; }
+  .beracha-sticky .chip-row { margin-bottom: 0; }
+
+  /* 11 צ'יפים נשברו ל-4 שורות (160px), והרביעית הכילה צ'יפ בודד. */
+  #beracha-categories {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-inline: -16px;
+    padding-inline: 16px;
+    padding-block: 2px;
+  }
+  #beracha-categories::-webkit-scrollbar { display: none; }
+  #beracha-categories .chip { flex: none; scroll-snap-align: start; }
+}
+
+/* אין כאן נפילה לטור אחד: "האתר" ו"כלים" הן שתי רשימות של שלושה קישורים
+   קצרים, והן נכנסות זו לצד זו גם ב-320px. */
+
+/* מסכים צרים מאוד: ב-360px המקרה הגרוע ("המוציא" + "ברכת המזון") נוגע
+   בדיוק בקצה הפנימי בלי שוליים, ולכן שתי התוויות נערמות. */
+@media (max-width: 359px) {
+  .beracha-table td:nth-child(2),
+  .beracha-table td:nth-child(3) { grid-column: 1 / -1; }
+}
+
+@media (max-width: 400px) {
+  .logo__mark { width: 32px; height: 32px; }
+  .logo__name { font-size: 20px; }
+  /* 22px ולא 19px — הועלה יחד עם רצפת ה-clamp של הפסוק. */
+  .hero__verse { font-size: 22px; }
+  .zman-hero { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .zman-hero__item { padding: 15px 10px; }
+  .zman-hero__value { font-size: 27px; }
+}
+
+/* יעדי מגע במכשירי מגע — ללא קשר לרוחב המסך. */
+@media (pointer: coarse) {
+  .nav__link { min-height: 44px; display: flex; align-items: center; }
+  .chip { min-height: 40px; display: inline-flex; align-items: center; }
+  .search__option { min-height: 48px; }
+
+  /* 44px נכנס בנוחות ב-min-height של 56px שנקבע לכותרת בנייד. */
+  .icon-button { width: 44px; height: 44px; }
+  .search__clear { width: 34px; height: 34px; font-size: 19px; }
+  .breadcrumbs a { display: inline-block; padding-block: 9px; }
+
+  /* הכלל שהיה כאן טיפל בקישורי הפוטר המוערמים והחריג מהם את תגיות
+     הנושאים. אחרי שכל קישורי הפוטר הפכו לתגיות עם ריפוד משלהן הוא כבר
+     לא תפס דבר, ולכן הוסר. */
+}
+
+/* ============================================================
+   הדפסה — עמוד שאלה ועמוד זמנים אמורים לצאת נקי במדפסת
+   ============================================================ */
+@media print {
+  .topbar, .footer, .search, .nav, .icon-button { display: none !important; }
+  body { background: #fff; color: #000; }
+  .card, .qa-list, .answer-direct { box-shadow: none; border-color: #ccc; }
+}

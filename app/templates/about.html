@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% from "macros.html" import category_grid %}
+
+{% block content %}
+<section class="section">
+  <div class="wrap wrap--narrow">
+    <p class="eyebrow">אודות</p>
+    <h1 class="section__title" style="font-size:clamp(28px,4.6vw,44px)">
+      על {{ site_name }}
+    </h1>
+
+    <blockquote style="margin:26px 0 0;padding:0;border:0">
+      <p style="font-family:var(--font-serif);font-size:19px;line-height:2;font-weight:500">
+        {{ verse }}
+      </p>
+      <cite style="font-size:13px;letter-spacing:.12em;color:var(--gold-deep);font-style:normal">
+        {{ verse_source }}
+      </cite>
+    </blockquote>
+
+    <div class="prose" style="margin-top:32px">
+      {{ about_html | safe }}
+    </div>
+
+    <div class="grid-cards" style="margin-top:32px">
+      <div class="card">
+        <h2 class="card__title">מה יש במאגר</h2>
+        <ul class="panel-list">
+          <li><span style="flex:1">שאלות ותשובות</span><b>{{ total_questions }}</b></li>
+          <li><span style="flex:1">נושאים</span><b>{{ categories | length }}</b></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h2 class="card__title">איך ממוספרות השאלות</h2>
+        <p style="font-size:15px;color:var(--ink-muted)">
+          המספור רץ על פני כל האתר ואינו מתאפס בין נושא לנושא. אם בנושא הראשון
+          יש שלוש שאלות, השאלה הראשונה בנושא הבא היא שאלה 4. אפשר להגיע לכל
+          שאלה ישירות דרך <code>/q/מספר</code>.
+        </p>
+      </div>
+    </div>
+
+    <p class="disclaimer">
+      האתר הוא כלי לימוד והתמצאות. אינו תחליף לשאלת רב, ואין להסתמך עליו למעשה
+      בלי בירור — בפרט במקרים שיש בהם נסיבות מיוחדות.
+    </p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    {{ category_grid(heading='הנושאים במאגר', eyebrow='האתר', categories=categories) }}
+  </div>
+</section>
+{% endblock %}

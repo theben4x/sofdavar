@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% from "macros.html" import ornament %}
+
+{% block content %}
+<section class="section" style="padding-bottom:26px">
+  <div class="wrap">
+    <p class="eyebrow">זמני היום</p>
+    <h1 class="section__title" style="font-size:clamp(28px,4.4vw,42px)">
+      זמנים ב{{ city.name }}
+    </h1>
+    <p style="margin-top:10px;color:var(--ink-muted)">
+      {{ data.hebrew_date }} · {{ day.strftime('%d.%m.%Y') }}
+    </p>
+
+    {% if data.holidays or data.omer %}
+    <div class="chip-row" style="margin-top:14px">
+      {% for holiday in data.holidays %}
+      <span class="chip chip--holiday">{{ holiday.name }}</span>
+      {% endfor %}
+      {% if data.omer %}<span class="chip chip--holiday">{{ data.omer }} לעומר</span>{% endif %}
+    </div>
+    {% endif %}
+
+    <form class="controls" method="get" action="{{ url_for('zmanim_page') }}" style="margin-top:24px">
+      <div class="field">
+        <label class="field__label" for="city">עיר</label>
+        <select id="city" name="city">
+          {% for option in cities %}
+          <option value="{{ option.slug }}" {% if option.slug == city.slug %}selected{% endif %}>
+            {{ option.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label class="field__label" for="date">תאריך</label>
+        <input id="date" name="date" type="date" value="{{ day.isoformat() }}">
+      </div>
+      <button class="button button--gold" type="submit">הצג</button>
+      {% if day != today %}
+      <a class="button" href="{{ url_for('zmanim_page', city=city.slug) }}">חזרה להיום</a>
+      {% endif %}
+    </form>
+  </div>
+</section>
+
+<section style="padding-bottom:40px">
+  <div class="wrap">
+    <div class="zman-hero">
+      <div class="zman-hero__item">
+        <div class="zman-hero__label">הנץ החמה</div>
+        <div class="zman-hero__value">{{ data.by_key.sunrise.formatted }}</div>
+        <div class="zman-hero__note">זריחה</div>
+      </div>
+      <div class="zman-hero__item">
+        <div class="zman-hero__label">חצות היום</div>
+        <div class="zman-hero__value">{{ data.by_key.chatzot.formatted }}</div>
+        <div class="zman-hero__note">אמצע היום</div>
+      </div>
+      <div class="zman-hero__item">
+        <div class="zman-hero__label">שקיעה</div>
+        <div class="zman-hero__value">{{ data.by_key.sunset.formatted }}</div>
+        <div class="zman-hero__note">שקיעת החמה</div>
+      </div>
+      <div class="zman-hero__item">
+        <div class="zman-hero__label">צאת הכוכבים</div>
+        <div class="zman-hero__value">{{ data.by_key.tzeit.formatted }}</div>
+        <div class="zman-hero__note">שלושה כוכבים</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-bottom:40px">
+  <div class="wrap">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:20px 24px 0">
+        <h2 class="card__title">שבת {{ shabbat.hebrew_date }}</h2>
+        {% if shabbat.holidays %}
+        <div class="chip-row" style="margin-bottom:12px">
+          {% for holiday in shabbat.holidays %}
+          <span class="chip chip--holiday">{{ holiday.name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <div class="table-scroll">
+        <table class="zman-table">
+          <caption class="visually-hidden">זמני כניסת ויציאת השבת</caption>
+          <tbody>
+            <tr data-primary="1">
+              <td class="zman-table__label">כניסת שבת</td>
+              <td class="zman-table__time">
+                {{ shabbat.entry.strftime('%H:%M') if shabbat.entry else '—' }}
+              </td>
+              <td class="zman-table__note">
+                {{ city.candle_offset }} דקות לפני השקיעה
+                {%- if city.candle_note %} · {{ city.candle_note }}{% endif %}
+              </td>
+            </tr>
+            <tr data-primary="1">
+              <td class="zman-table__label">צאת שבת</td>
+              <td class="zman-table__time">
+                {{ shabbat.exit.strftime('%H:%M') if shabbat.exit else '—' }}
+              </td>
+              <td class="zman-table__note">צאת הכוכבים, 8.5° מתחת לאופק</td>
+            </tr>
+            <tr>
+              <td class="zman-table__label">צאת שבת לרבנו תם</td>
+              <td class="zman-table__time">
+                {{ shabbat.exit_rabbeinu_tam.strftime('%H:%M') if shabbat.exit_rabbeinu_tam else '—' }}
+              </td>
+              <td class="zman-table__note">72 דקות אחרי השקיעה</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-bottom:40px">
+  <div class="wrap">
+    {{ ornament() }}
+    <h2 class="section__title" style="font-size:22px;margin:26px 0 14px">כל זמני היום</h2>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="table-scroll">
+        <table class="zman-table">
+          <caption class="visually-hidden">זמני היום ההלכתיים</caption>
+          <thead>
+            <tr><th>זמן</th><th>שעה</th><th>הגדרה</th></tr>
+          </thead>
+          <tbody>
+            {% for zman in data.zmanim %}
+            <tr data-primary="{{ 1 if zman.primary else 0 }}">
+              <td class="zman-table__label">{{ zman.label }}</td>
+              <td class="zman-table__time">
+                <time datetime="{{ zman.iso }}">{{ zman.formatted }}</time>
+              </td>
+              <td class="zman-table__note">{{ zman.note }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-cards" style="margin-top:16px">
+      <div class="card">
+        <h3 class="card__title">שעה זמנית</h3>
+        <ul class="panel-list">
+          <li>
+            <span style="flex:1">לפי הגר"א</span>
+            <b>{{ (data.shaa_zmanit_gra.total_seconds() // 60) | int }} דקות</b>
+          </li>
+          <li>
+            <span style="flex:1">לפי המגן אברהם</span>
+            <b>{{ (data.shaa_zmanit_mga.total_seconds() // 60) | int }} דקות</b>
+          </li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="card__title">איך הזמנים מחושבים</h3>
+        <p style="font-size:14.5px;color:var(--ink-muted)">
+          החישוב אסטרונומי ונעשה בשרת עצמו, לפי קו הרוחב והאורך של {{ city.name }},
+          <b>בגובה פני הים</b> — כמו ברוב הלוחות המקובלים ולא לפי גובה היישוב.
+          זמן הדלקת הנרות אינו חישוב אלא מנהג המקום.
+        </p>
+      </div>
+    </div>
+
+    <p class="disclaimer">
+      הזמנים נועדו להתמצאות. בכניסת שבת ובצאתה, ובכל דבר שיש בו נפקא מינה למעשה,
+      יש לסמוך על הלוח המקובל במקומכם ועל הוראת רב.
+    </p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+  <div class="wrap wrap--narrow">
+    <p class="eyebrow">בלוג</p>
+    <h1 class="section__title" style="font-size:clamp(28px,4.6vw,44px)">
+      מאמרים
+    </h1>
+    <p style="margin-top:12px;color:var(--ink-muted);max-width:58ch">
+      על הלכה ומנהג, על דרכי לימוד, ועל הדברים שמאחורי השאלות שבמאגר.
+    </p>
+  </div>
+</section>
+
+<section style="padding-bottom:60px">
+  <div class="wrap wrap--narrow">
+    {% if posts %}
+    <div class="post-list">
+      {% for post in posts %}
+      <a class="post-card" href="{{ url_for('blog_post', slug=post.slug) }}">
+        <div class="post-card__meta">
+          <time datetime="{{ post.date.isoformat() }}">{{ post.display_date }}</time>
+          <span>·</span>
+          <span>{{ post.reading_minutes }} דקות קריאה</span>
+          {% for tag in post.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+        </div>
+        <h2 class="post-card__title">{{ post.title }}</h2>
+        <p class="post-card__desc">{{ post.description }}</p>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+      <p class="empty__title">אין עדיין פוסטים</p>
+      <p class="empty__text">
+        פוסט נוסף על ידי יצירת קובץ <code>.md</code> בתיקייה <code>content/blog</code>.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

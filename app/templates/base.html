@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+{# סמל מוטבע: בלי קובץ נוסף ובלי בקשת רשת. בלעדיו הדפדפן מבקש
+   /favicon.ico ומקבל 404 של 8KB בכל ניווט. #A67C2E הוא --gold. #}
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23A67C2E' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 13.5 9.5 8l5 3L20 5.5 25.5 11l5-3-2.5 5.5Z'/%3E%3Cpath d='M20 19.5c-2.2-1.9-5.3-2.9-8.8-2.9H8V31h3.2c3.5 0 6.6 1 8.8 2.9'/%3E%3Cpath d='M20 19.5c2.2-1.9 5.3-2.9 8.8-2.9H32V31h-3.2c-3.5 0-6.6 1-8.8 2.9'/%3E%3Cpath d='M20 19.5v14.4'/%3E%3C/svg%3E">
+
+{# ---- מטא לכל עמוד. המקבילה ל-generateMetadata: כותרת, תיאור, canonical ושיתוף ---- #}
+<title>{{ meta.title }}</title>
+<meta name="description" content="{{ meta.description }}">
+<link rel="canonical" href="{{ meta.canonical }}">
+{% if meta.noindex %}<meta name="robots" content="noindex, follow">{% endif %}
+
+<meta property="og:type" content="{{ meta.og_type | default('website') }}">
+<meta property="og:site_name" content="{{ site_name }}">
+<meta property="og:locale" content="he_IL">
+<meta property="og:title" content="{{ meta.raw_title }}">
+<meta property="og:description" content="{{ meta.description }}">
+<meta property="og:url" content="{{ meta.canonical }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ meta.raw_title }}">
+<meta name="twitter:description" content="{{ meta.description }}">
+<meta name="theme-color" content="#F5F3EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16160F" media="(prefers-color-scheme: dark)">
+
+{# ---- קובע את המצב לפני הציור הראשון, אחרת יש הבזק לבן במעבר למצב כהה ---- #}
+<script>
+(function () {
+  try {
+    var saved = localStorage.getItem('sofdavar-theme');
+    var dark = saved ? saved === 'dark'
+                     : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  } catch (e) {
+    document.documentElement.dataset.theme = 'light';
+  }
+  /* מסמן שיש JS, כדי שכפתורים שתלויים בו (העתקה, שיתוף) לא יוצגו כמתים
+     כשהוא חסום. נעשה כאן ולא ב-site.js — שם זה היה מהבהב אחרי הציור. */
+  document.documentElement.classList.add('has-js');
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{# משקל 900 הוסר — אפס אלמנטים באתר מחושבים אליו. #}
+<link rel="preload" as="style" fetchpriority="high"
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Noto+Serif+Hebrew:wght@400;500;700&display=swap">
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Noto+Serif+Hebrew:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="{{ static_v('css/site.css') }}">
+
+{% for block in meta.jsonld | default([]) %}
+<script type="application/ld+json">{{ block | tojson }}</script>
+{% endfor %}
+</head>
+
+<body>
+<a class="skip-link" href="#main">דלג לתוכן הראשי</a>
+
+<header class="topbar" id="topbar">
+  <div class="wrap topbar__inner">
+    <a class="logo" href="{{ url_for('home') }}">
+      <svg class="logo__mark" viewBox="0 0 40 40" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 13.5 9.5 8l5 3L20 5.5 25.5 11l5-3-2.5 5.5Z"/>
+        <path d="M20 19.5c-2.2-1.9-5.3-2.9-8.8-2.9H8V31h3.2c3.5 0 6.6 1 8.8 2.9"/>
+        <path d="M20 19.5c2.2-1.9 5.3-2.9 8.8-2.9H32V31h-3.2c-3.5 0-6.6 1-8.8 2.9"/>
+        <path d="M20 19.5v14.4"/>
+      </svg>
+      <span class="logo__text">
+        <span class="logo__name">{{ site_name }}</span>
+        <span class="logo__sub">שאלות ותשובות בהלכה</span>
+      </span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="ניווט ראשי">
+      <a class="nav__link" href="{{ url_for('home') }}"
+         {% if current_path == '/' %}aria-current="page"{% endif %}>דף הבית</a>
+      <a class="nav__link" href="{{ url_for('berachot_page') }}"
+         {% if current_path == '/ma-nevarech' %}aria-current="page"{% endif %}>מה נברך</a>
+      <a class="nav__link" href="{{ url_for('zmanim_page') }}"
+         {% if current_path == '/zmanim' %}aria-current="page"{% endif %}>זמנים</a>
+      <a class="nav__link" href="{{ url_for('blog_index') }}"
+         {% if current_path.startswith('/blog') %}aria-current="page"{% endif %}>בלוג</a>
+      <a class="nav__link" href="{{ url_for('about') }}"
+         {% if current_path == '/about' %}aria-current="page"{% endif %}>אודות</a>
+    </nav>
+
+  {# הפקדים עטופים יחד כדי שהסרגל יהיה שלושה תאים — לוגו | ניווט | פקדים —
+     ורק כך הניווט ממורכז במרכז העמוד ולא במרכז מה שנשאר בין השניים. #}
+  <div class="topbar__actions">
+    {# חיפוש זמין מכל עמוד, ליד מתג הבהיר/כהה. קישור-אייקון ולא תיבת חיפוש
+       שנייה, וכ-<a> רגיל הוא עובד גם בלי JS.
+       היה כאן תנאי שהסתיר אותו ב-/ ו-/search; הוסר כדי שמקומו בסרגל יהיה
+       קבוע — אייקון שמופיע ונעלם בין עמודים מאלץ חיפוש מחדש בכל ניווט. #}
+    <a class="icon-button" href="{{ url_for('search_page') }}" aria-label="חיפוש במאגר"
+       {% if current_path == '/search' %}aria-current="page"{% endif %}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+      </svg>
+    </a>
+
+    <button class="icon-button" type="button" id="theme-toggle"
+            aria-label="החלף בין מצב בהיר לכהה">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+      </svg>
+    </button>
+
+    <button class="icon-button nav-toggle" type="button" id="nav-toggle"
+            aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" aria-hidden="true">
+        <path d="M4 7h16M4 12h16M4 17h16"/>
+      </svg>
+    </button>
+  </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+  {% block content %}{% endblock %}
+</main>
+
+{# רצועה שחורה מעל הפוטר: פרשת השבוע בימין, כניסת השבת בירושלים בשמאל.
+   שני הנתונים מגיעים מאותה שבת (ראה inject_globals), ולכן הם לא יכולים
+   להצביע על שבועות שונים. #}
+<aside class="ribbon" aria-label="פרשת השבוע וזמני השבת">
+  <div class="wrap ribbon__inner">
+    {% if strip_parasha %}
+    <p class="ribbon__item">
+      <span class="ribbon__label">פרשת השבוע</span>
+      <span class="ribbon__value">{{ strip_parasha }}</span>
+    </p>
+    {% endif %}
+
+    {% if strip_shabbat.entry %}
+    <p class="ribbon__item ribbon__item--end">
+      <span class="ribbon__label">כניסת השבת בירושלים</span>
+      <time class="ribbon__value ribbon__value--num"
+            datetime="{{ strip_shabbat.entry.strftime('%Y-%m-%dT%H:%M') }}">
+        {{ strip_shabbat.entry.strftime('%H:%M') }}
+      </time>
+    </p>
+    {% endif %}
+  </div>
+</aside>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <div class="footer__logo">
+          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 13.5 9.5 8l5 3L20 5.5 25.5 11l5-3-2.5 5.5Z"/>
+            <path d="M20 19.5c-2.2-1.9-5.3-2.9-8.8-2.9H8V31h3.2c3.5 0 6.6 1 8.8 2.9"/>
+            <path d="M20 19.5c2.2-1.9 5.3-2.9 8.8-2.9H32V31h-3.2c-3.5 0-6.6 1-8.8 2.9"/>
+            <path d="M20 19.5v14.4"/>
+          </svg>
+          <span>{{ site_name }}</span>
+        </div>
+        <p class="footer__verse">{{ verse }}</p>
+        <p class="footer__source">{{ verse_source }}</p>
+      </div>
+
+      {# עמודת העמודים. אותו סדר כמו בסרגל העליון, בתוספת דף הבית. #}
+      <nav class="footer__col" aria-label="עמודי האתר">
+        <div class="footer__title">האתר</div>
+        <ul class="footer__links">
+          <li><a href="{{ url_for('home') }}"
+                 {% if current_path == '/' %}aria-current="page"{% endif %}>דף הבית</a></li>
+          <li><a href="{{ url_for('berachot_page') }}"
+                 {% if current_path == '/ma-nevarech' %}aria-current="page"{% endif %}>מה נברך</a></li>
+          <li><a href="{{ url_for('zmanim_page') }}"
+                 {% if current_path == '/zmanim' %}aria-current="page"{% endif %}>זמנים</a></li>
+          <li><a href="{{ url_for('blog_index') }}"
+                 {% if current_path.startswith('/blog') %}aria-current="page"{% endif %}>בלוג</a></li>
+          <li><a href="{{ url_for('about') }}"
+                 {% if current_path == '/about' %}aria-current="page"{% endif %}>אודות</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer__col" aria-label="נושאים">
+        <div class="footer__title">נושאים</div>
+        <ul class="footer__links">
+          {# 8 ולא 20: טור בודד, ואורכו צריך להתיישר עם עמודת העמודים
+             שלצידו. הרשימה המלאה נמצאת ברשת הקטגוריות בדף הבית. #}
+          {% for category in nav_categories[:8] %}
+          <li><a href="/{{ category.slug }}">{{ category.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+
+    <div class="footer__bottom">
+      <span>© {{ current_year }} {{ site_name }}</span>
+      <span>התוכן נועד ללימוד. למעשה — יש לשאול רב.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="{{ static_v('js/site.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

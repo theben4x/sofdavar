@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "macros.html" import search_box %}
+
+{% block content %}
+<section class="section">
+  <div class="wrap wrap--narrow">
+    <div class="empty">
+      <p class="eyebrow">שגיאה 404</p>
+      <p class="empty__title">הדף לא נמצא</p>
+      <p class="empty__text">
+        ייתכן שהכתובת השתנתה, או שהשאלה שחיפשתם עדיין לא נכנסה למאגר.
+      </p>
+      <a class="button button--gold" href="{{ url_for('home') }}">לדף הבית</a>
+    </div>
+
+    {{ search_box() }}
+  </div>
+</section>
+{% endblock %}

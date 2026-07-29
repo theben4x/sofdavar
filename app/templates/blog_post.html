@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "macros.html" import ornament %}
+
+{% block content %}
+<article>
+  <header class="post-header">
+    <div class="wrap wrap--narrow">
+      <nav class="breadcrumbs" style="justify-content:center" aria-label="מיקום">
+        <a href="{{ url_for('home') }}">{{ site_name }}</a>
+        <span class="breadcrumbs__sep">›</span>
+        <a href="{{ url_for('blog_index') }}">בלוג</a>
+      </nav>
+
+      <div class="post-card__meta" style="justify-content:center">
+        <time datetime="{{ post.date.isoformat() }}">{{ post.display_date }}</time>
+        <span>·</span>
+        <span>{{ post.reading_minutes }} דקות קריאה</span>
+      </div>
+
+      <h1 class="post-header__title">{{ post.title }}</h1>
+
+      {% if post.tags %}
+      <div class="chip-row" style="justify-content:center;margin-top:18px">
+        {% for tag in post.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <section class="section" style="padding-top:26px">
+    <div class="wrap wrap--narrow">
+      {{ ornament() }}
+      <div class="prose" style="margin:30px auto 0">
+        {{ post.html | safe }}
+      </div>
+    </div>
+  </section>
+</article>
+
+<section style="padding-bottom:60px">
+  <div class="wrap wrap--narrow">
+    <a class="button button--gold" href="{{ url_for('blog_index') }}">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5m7-7-7 7 7 7"/>
+      </svg>
+      לכל המאמרים
+    </a>
+  </div>
+</section>
+{% endblock %}

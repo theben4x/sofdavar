@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "yahadut",
+    "name": "יהדות",
+    "color": "--cat-tefila",
+    "icon": "<path d=\"M12 3.2 19.4 16H4.6z\"/><path d=\"M12 20.8 4.6 8h14.8z\"/>"
+  },
+  {
+    "slug": "shabbat",
+    "name": "שבת",
+    "color": "--cat-shabbat",
+    "icon": "<path d=\"M12 3c1 3-1 4-1 6a3 3 0 006 0c0-1-.3-2-1-3 2 2 3 4 3 7a7 7 0 11-14 0c0-4 3-7 7-10z\"/>"
+  },
+  {
+    "slug": "kashrut",
+    "name": "כשרות",
+    "color": "--cat-kashrut",
+    "icon": "<path d=\"M7 3v8m0 0a2.5 2.5 0 002.5-2.5V3M7 11a2.5 2.5 0 01-2.5-2.5V3M7 11v10M17 3c-1.5 1.5-2 3-2 5s.7 3 2 3v10\"/>"
+  },
+  {
+    "slug": "tefila",
+    "name": "תפילה",
+    "color": "--cat-tefila",
+    "icon": "<path d=\"M12 6c-1.5-1.3-3.6-2-6-2H3v14h3c2.4 0 4.5.7 6 2m0-14c1.5-1.3 3.6-2 6-2h3v14h-3c-2.4 0-4.5.7-6 2m0-14v14\"/>"
+  },
+  {
+    "slug": "rosh-hashana",
+    "name": "ראש השנה",
+    "color": "--cat-moadim",
+    "icon": "<path d=\"M3.5 15.5c0-1.7 1.2-2.9 2.9-2.9 1.5 0 2.4.7 3.8.7 3.4 0 6.4-2.6 8.3-6.8.6-1.3 1.5-2 2.5-2 .4 2.6 0 5.6-1.3 8.4-2.2 4.7-6.4 7.6-10.6 7.6-3.3 0-5.6-2-5.6-5z\"/>"
+  },
+  {
+    "slug": "yom-kippur",
+    "name": "יום הכיפורים",
+    "color": "--cat-moadim",
+    "icon": "<path d=\"M12 4v16M8 20h8M5 8h14M5 8l-2.5 5h5zM19 8l-2.5 5h5z\"/>"
+  },
+  {
+    "slug": "sukkot",
+    "name": "סוכות",
+    "color": "--cat-moadim",
+    "icon": "<path d=\"M3.5 9.5h17M5.5 9.5V20M18.5 9.5V20M3.5 9.5 6.5 5h11l3 4.5M9 9.5v2.5M12 9.5v2.5M15 9.5v2.5\"/>"
+  },
+  {
+    "slug": "chanuka",
+    "name": "חנוכה",
+    "color": "--cat-berachot",
+    "icon": "<path d=\"M12 7v12M9 21h6M5 9v1.5A7 7 0 0012 17a7 7 0 007-6.5V9M8.5 9v1a3.5 3.5 0 003.5 3.5A3.5 3.5 0 0015.5 10V9\"/>"
+  },
+  {
+    "slug": "purim",
+    "name": "פורים",
+    "color": "--cat-bein",
+    "icon": "<path d=\"M3.5 8.2c0-1 .9-1.8 1.9-1.7 2.1.2 4.5.5 6.6.5s4.5-.3 6.6-.5c1-.1 1.9.7 1.9 1.7 0 4.6-2.1 9.8-5.2 9.8-1.6 0-2.4-1.6-3.3-1.6s-1.7 1.6-3.3 1.6c-3.1 0-5.2-5.2-5.2-9.8z\"/><path d=\"M8.5 11h.01M15.5 11h.01\"/>"
+  },
+  {
+    "slug": "pesach",
+    "name": "פסח",
+    "color": "--cat-moadim",
+    "icon": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"/><path d=\"M8.5 8h.01M12 8h.01M15.5 8h.01M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01\"/>"
+  },
+  {
+    "slug": "shavuot",
+    "name": "שבועות",
+    "color": "--cat-moadim",
+    "icon": "<path d=\"M11.2 20H4V9.5a3.6 3.6 0 017.2 0zM20 20h-7.2V9.5a3.6 3.6 0 017.2 0z\"/>"
+  },
+  {
+    "slug": "lashon-hara",
+    "name": "לשון הרע",
+    "color": "--cat-bein",
+    "icon": "<path d=\"M20.5 11.5a8 8 0 01-11.6 7.2L4 20.2l1.4-4.6a8 8 0 1115.1-4.1z\"/><path d=\"M9 11.5h7\"/>"
+  },
+  {
+    "slug": "kibud-horim",
+    "name": "כיבוד הורים",
+    "color": "--cat-mishpacha",
+    "icon": "<circle cx=\"8\" cy=\"6.5\" r=\"2.6\"/><path d=\"M3.4 19.5c0-2.6 2.1-4.6 4.6-4.6s4.6 2 4.6 4.6\"/><circle cx=\"16.8\" cy=\"10\" r=\"2.1\"/><path d=\"M13.6 19.5c0-2 1.4-3.6 3.2-3.6s3.2 1.6 3.2 3.6\"/>"
+  },
+  {
+    "slug": "tefilin",
+    "name": "תפילין",
+    "color": "--cat-stam",
+    "icon": "<rect x=\"6\" y=\"8\" width=\"12\" height=\"8\" rx=\"2\"/><path d=\"M12 8V4M6 12H2M18 12h4\"/>"
+  },
+  {
+    "slug": "tzniut",
+    "name": "צניעות",
+    "color": "--cat-mishpacha",
+    "icon": "<path d=\"M10 3.5h4v2.2l2.8 1.9-1.1 12.9H8.3L7.2 7.6 10 5.7z\"/><path d=\"M10 3.5c0 1.1.9 2 2 2s2-.9 2-2\"/>"
+  },
+  {
+    "slug": "avelut",
+    "name": "אבלות",
+    "color": "--cat-avelut",
+    "icon": "<path d=\"M12 3c-1 1.5-1.5 2-1.5 3a1.5 1.5 0 003 0c0-1-.5-1.5-1.5-3z\"/><rect x=\"9\" y=\"9\" width=\"6\" height=\"12\" rx=\"1\"/><path d=\"M9 12h6\"/>"
+  },
+  {
+    "slug": "beit-knesset",
+    "name": "בית כנסת",
+    "color": "--cat-tefila",
+    "icon": "<path d=\"M4 21V9.5L12 4l8 5.5V21\"/><path d=\"M9.8 21v-4.6a2.2 2.2 0 014.4 0V21\"/><path d=\"M2.5 21h19\"/>"
+  },
+  {
+    "slug": "maamad-haisha",
+    "name": "מעמד האישה",
+    "color": "--cat-bein",
+    "icon": "<circle cx=\"12\" cy=\"5.8\" r=\"2.6\"/><path d=\"M8 20l1.6-7.4c.4-1.7 1.3-2.6 2.4-2.6s2 .9 2.4 2.6L16 20z\"/><path d=\"M9.4 16.2h5.2\"/>"
+  },
+  {
+    "slug": "mezuza",
+    "name": "מזוזה",
+    "color": "--cat-stam",
+    "icon": "<rect x=\"9\" y=\"3\" width=\"6\" height=\"18\" rx=\"3\"/><path d=\"M12 8v8\"/>"
+  },
+  {
+    "slug": "tzitzit",
+    "name": "ציצית",
+    "color": "--cat-stam",
+    "icon": "<path d=\"M4 4.5h16v8.5a3.5 3.5 0 01-3.5 3.5h-9A3.5 3.5 0 014 13z\"/><path d=\"M8 16.5v4M12 16.5v4M16 16.5v4\"/>"
+  }
+]

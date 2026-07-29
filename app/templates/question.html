@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% from "macros.html" import qa_accordion_item, ornament %}
+
+{% block content %}
+<article>
+  <section style="padding:34px 0 0">
+    <div class="wrap wrap--narrow">
+      <nav class="breadcrumbs" aria-label="מיקום">
+        <a href="{{ url_for('home') }}">{{ site_name }}</a>
+        <span class="breadcrumbs__sep">›</span>
+        <a href="/{{ question.category_slug }}">{{ question.category_name }}</a>
+        <span class="breadcrumbs__sep">›</span>
+        <span aria-current="page">שאלה {{ question.number }}</span>
+      </nav>
+    </div>
+  </section>
+
+  {# הכותרת היא השאלה עצמה, ומיד אחריה התשובה הישירה — בלי שום דבר ביניהם. #}
+  <header class="question-card" style="max-width:640px">
+    <div class="question-card__badge">שאלה {{ question.number }}</div>
+    <h1 class="question-card__title question-card__title--page">
+      {{ question.question }}
+    </h1>
+  </header>
+
+  <section style="padding-bottom:16px">
+    <div class="wrap wrap--narrow">
+      <div class="answer-direct">
+        <span class="answer-direct__label">התשובה בקצרה</span>
+        {{ question.short_answer }}
+      </div>
+
+    </div>
+  </section>
+
+  {% if question.body %}
+  <section class="section" style="padding-top:34px">
+    <div class="wrap wrap--narrow">
+      <h2 class="section__title section__title--sub">הרחבה</h2>
+      <div class="prose">
+        {% for paragraph in question.body %}<p>{{ paragraph }}</p>{% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {# שיתוף והעתקה — מתחת להרחבה. בלי תוויות טקסט, ולכן לכל כפתור חייב
+     להיות aria-label: בלעדיו קורא מסך מקריא "לחצן" בלבד.
+     וואטסאפ הוא <a> רגיל ולכן עובד גם בלי JS; כפתורי ההעתקה מוסתרים עד
+     שה-JS מסמן .has-js, כדי שלא יוצג כפתור מת. טקסט התשובה מגיע כ-data
+     ולא נשאב מה-DOM — כך ההעתקה לא נשברת אם מבנה העמוד ישתנה. #}
+  <section style="padding-bottom:34px">
+    <div class="wrap wrap--narrow">
+      <div class="qa-actions"
+           data-share-url="{{ meta.canonical }}"
+           data-answer="{{ ([question.short_answer] + question.body) | join('\n\n') }}">
+        <a class="qa-action qa-action--wa"
+           href="https://wa.me/?text={{ (question.question ~ '\n\n' ~ question.short_answer ~ '\n\n' ~ meta.canonical) | urlencode }}"
+           target="_blank" rel="noopener"
+           aria-label="שיתוף בוואטסאפ" title="שיתוף בוואטסאפ">
+          <svg class="qa-action__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.86 9.86 0 004.74 1.21h.01c5.46 0 9.9-4.44 9.9-9.9 0-2.64-1.03-5.12-2.9-6.99A9.82 9.82 0 0012.04 2zm5.8 14.13c-.25.69-1.43 1.32-1.99 1.4-.53.08-1.18.11-1.9-.12a17.3 17.3 0 01-1.72-.64c-3.03-1.31-5-4.36-5.16-4.56-.15-.2-1.23-1.63-1.23-3.12 0-1.48.78-2.21 1.05-2.51.28-.3.6-.38.8-.38h.58c.18 0 .43-.7.67.51.25.6.84 2.08.91 2.23.08.15.13.33.03.53-.1.2-.15.32-.3.5l-.44.51c-.15.15-.3.31-.13.61.18.3.78 1.29 1.68 2.09 1.15 1.03 2.13 1.35 2.43 1.5.3.15.48.13.65-.08.18-.2.75-.87.95-1.17.2-.3.4-.25.67-.15.28.1 1.75.83 2.05.98.3.15.5.23.57.35.08.13.08.73-.17 1.42z"/>
+          </svg>
+        </a>
+
+        <button class="qa-action js-only" type="button" data-copy="url"
+                aria-label="העתקת קישור" title="העתקת קישור">
+          <svg class="qa-action__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 13a5 5 0 007.5.5l3-3a5 5 0 00-7-7l-1.7 1.7"/>
+            <path d="M14 11a5 5 0 00-7.5-.5l-3 3a5 5 0 007 7L12 19"/>
+          </svg>
+          <svg class="qa-action__check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m20 6-11 11-5-5"/>
+          </svg>
+        </button>
+
+        <button class="qa-action js-only" type="button" data-copy="answer"
+                aria-label="העתקת התשובה" title="העתקת התשובה">
+          <svg class="qa-action__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="12" height="12" rx="2"/>
+            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+          </svg>
+          <svg class="qa-action__check" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m20 6-11 11-5-5"/>
+          </svg>
+        </button>
+
+        {# Web Share API — נחשף ע"י ה-JS רק בדפדפנים שתומכים בו. #}
+        <button class="qa-action js-only" type="button" data-share hidden
+                aria-label="שיתוף" title="שיתוף">
+          <svg class="qa-action__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>
+          </svg>
+        </button>
+
+        {# המשוב הוויזואלי הוא הווי; זה מה שנמסר לקורא מסך. #}
+        <p class="visually-hidden" role="status" aria-live="polite" data-status></p>
+      </div>
+    </div>
+  </section>
+
+  {% if question.minhag_ashkenaz or question.minhag_sepharad %}
+  <section style="padding-bottom:40px">
+    <div class="wrap wrap--narrow">
+      <h2 class="section__title section__title--sub">הבדלי מנהג</h2>
+      <div class="minhag-grid">
+        {% if question.minhag_ashkenaz %}
+        <div class="minhag">
+          <div class="minhag__label">מנהג אשכנז</div>
+          <p>{{ question.minhag_ashkenaz }}</p>
+        </div>
+        {% endif %}
+        {% if question.minhag_sepharad %}
+        <div class="minhag">
+          <div class="minhag__label">מנהג ספרד ועדות המזרח</div>
+          <p>{{ question.minhag_sepharad }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if question.sources %}
+  <section style="padding-bottom:40px">
+    <div class="wrap wrap--narrow">
+      <h2 class="section__title section__title--sub">מקורות</h2>
+      <ul class="source-list">
+        {% for source in question.sources %}<li>{{ source }}</li>{% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+
+  <section style="padding-bottom:40px">
+    <div class="wrap wrap--narrow">
+      <p class="disclaimer">
+        התשובה נכתבה ללימוד ולהתמצאות בסוגיה. במקרה מעשי, ובפרט כשיש נסיבות
+        מיוחדות, יש לשאול רב.
+      </p>
+    </div>
+  </section>
+</article>
+
+{% if related %}
+<section class="section" style="padding-top:0">
+  <div class="wrap wrap--narrow">
+    {{ ornament() }}
+    <h2 class="section__title section__title--sub" style="margin-top:26px">שאלות קשורות</h2>
+    <div class="qa-list">
+      {% for item in related %}
+        {{ qa_accordion_item(item, item.category_slug | default(question.category_slug)) }}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if neighbours.prev or neighbours.next %}
+<section style="padding-bottom:34px">
+  <div class="wrap wrap--narrow">
+    {# ב-RTL הקודמת מימין והבאה משמאל, ולכן החצים מצביעים החוצה לכיוונים
+       ההפוכים מאשר ב-LTR. #}
+    <nav class="qa-nav" aria-label="ניווט בין שאלות">
+      {% if neighbours.prev %}
+      <a class="qa-nav__link qa-nav__link--prev"
+         href="/{{ neighbours.prev.category_slug }}/{{ neighbours.prev.slug }}"
+         rel="prev">
+        <span class="qa-nav__dir">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14m-7-7 7 7-7 7"/>
+          </svg>
+          שאלה קודמת
+        </span>
+        <span class="qa-nav__title">{{ neighbours.prev.question }}</span>
+      </a>
+      {% else %}<span></span>{% endif %}
+
+      {% if neighbours.next %}
+      <a class="qa-nav__link qa-nav__link--next"
+         href="/{{ neighbours.next.category_slug }}/{{ neighbours.next.slug }}"
+         rel="next">
+        <span class="qa-nav__dir">
+          שאלה הבאה
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 12H5m7-7-7 7 7 7"/>
+          </svg>
+        </span>
+        <span class="qa-nav__title">{{ neighbours.next.question }}</span>
+      </a>
+      {% endif %}
+    </nav>
+  </div>
+</section>
+{% endif %}
+
+<section style="padding-bottom:56px">
+  <div class="wrap wrap--narrow" style="display:flex;flex-wrap:wrap;gap:12px">
+    <a class="button button--gold" href="/{{ question.category_slug }}">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5m7-7-7 7 7 7"/>
+      </svg>
+      חזרה לכל השאלות ב{{ question.category_name }}
+    </a>
+    <a class="button" href="{{ url_for('home') }}">לדף הבית</a>
+  </div>
+</section>
+{% endblock %}

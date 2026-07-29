@@ -1,0 +1,8 @@
+Flask>=3.0
+Markdown>=3.5
+
+# Windows/macOS אין בהם את מסד אזורי הזמן של IANA, ו-zoneinfo נשען עליו.
+tzdata; sys_platform != "linux"
+
+# רק לסקריפט האימות scripts/verify_zmanim.py. האתר עצמו לא פונה לרשת.
+requests>=2.31

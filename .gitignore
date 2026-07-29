@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# מסד הנתונים הוא תוצר בנייה, לא מקור. הוא נבנה מ-data/seed/*.json:
+#     python scripts/build_db.py
+# קובץ בינארי שמשתנה בכל בנייה מנפח את היסטוריית הגיט בלי להוסיף מידע.
+data/sofdavar.db
+data/*.db-wal
+data/*.db-shm
+
+# מערכת הפעלה ועורכים
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp

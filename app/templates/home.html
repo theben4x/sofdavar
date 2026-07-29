@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% from "macros.html" import category_grid, search_box, ornament %}
+
+{% block content %}
+<section class="hero">
+  <div class="wrap">
+    <svg class="hero__crown" viewBox="0 0 48 48" fill="none" stroke="currentColor"
+         stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M10 32 6 14l10 6 8-11 8 11 10-6-4 18Z"/>
+      <path d="M10 37h28" opacity=".6"/>
+      <circle cx="24" cy="23" r="1.6" fill="currentColor" stroke="none"/>
+    </svg>
+
+    {# ההדגשה על שני הציוויים שבפסוק. הפוטר והמטא ממשיכים להשתמש בפסוק
+       הנקי, בלי תגיות. #}
+    <h1 class="hero__verse">{{ verse | emphasize(verse_emphasis) }}</h1>
+    <p class="hero__source">{{ verse_source }}</p>
+
+    {{ search_box() }}
+
+    {# המונה המונפש. הטקסט מופיע פעמיים בכוונה: העותק הנסתר (ghost) מחזיק
+       את רוחב הקפסולה מראש, אחרת היא מתנפחת תו אחר תו והמעוינים נדחפים
+       החוצה. שניהם חייבים להישאר זהים. #}
+    <div class="counter" id="counter">
+      <span class="counter__rule"></span>
+      <span class="counter__dot"></span>
+
+      <span class="counter__pill">
+        <span class="counter__line counter__ghost" aria-hidden="true">למעלה מ־<span class="counter__num">{{ display_total | thousands }}</span>שאלות ותשובות</span>
+        <span class="counter__typer">
+          <span class="counter__line">למעלה מ־<span class="counter__num">{{ display_total | thousands }}</span>שאלות ותשובות</span>
+        </span>
+      </span>
+
+      <span class="counter__dot counter__dot--b"></span>
+      <span class="counter__rule"></span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="categories">
+  <div class="wrap">
+    {# הפאנל נושא את הכותרת ואת המפריד בעצמו — אין צורך בכותרת מקטע נוספת. #}
+    {{ category_grid(categories=categories) }}
+    <p style="text-align:center;margin-top:18px">
+      <a class="section__link" href="{{ url_for('search_page') }}">
+        חיפוש מתקדם <span class="arrow-glyph" aria-hidden="true">←</span>
+      </a>
+    </p>
+  </div>
+</section>
+
+{% if question_of_day %}
+<section class="section">
+  <div class="wrap">
+    {{ ornament() }}
+    <p class="eyebrow eyebrow--centered">שאלת היום</p>
+
+    <article class="question-card">
+      <div class="question-card__badge">שאלה {{ question_of_day.number }}</div>
+      <h2 class="question-card__title">{{ question_of_day.question }}</h2>
+      <a class="question-card__link"
+         href="/{{ question_of_day.category_slug }}/{{ question_of_day.slug }}">
+        לתשובה המלאה <span class="arrow-glyph" aria-hidden="true">←</span>
+      </a>
+    </article>
+  </div>
+</section>
+{% endif %}
+
+<section class="section">
+  <div class="wrap">
+    <div class="grid-cards">
+      <div class="card">
+        <h3 class="card__title">השבת הקרובה ב{{ shabbat.city.name }}</h3>
+        <ul class="panel-list">
+          <li>
+            <span style="flex:1">כניסת שבת</span>
+            <b style="font-family:var(--font-serif);font-feature-settings:'tnum'">
+              {{ shabbat.entry.strftime('%H:%M') if shabbat.entry else '—' }}
+            </b>
+          </li>
+          <li>
+            <span style="flex:1">צאת שבת</span>
+            <b style="font-family:var(--font-serif);font-feature-settings:'tnum'">
+              {{ shabbat.exit.strftime('%H:%M') if shabbat.exit else '—' }}
+            </b>
+          </li>
+          <li>
+            <span style="flex:1">רבנו תם</span>
+            <b style="font-family:var(--font-serif);font-feature-settings:'tnum'">
+              {{ shabbat.exit_rabbeinu_tam.strftime('%H:%M') if shabbat.exit_rabbeinu_tam else '—' }}
+            </b>
+          </li>
+        </ul>
+        <p style="margin-top:16px">
+          <a class="button button--gold" href="{{ url_for('zmanim_page') }}">
+            כל הזמנים ובחירת עיר
+          </a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">מה נברך</h3>
+        <p style="color:var(--ink-muted);font-size:15px">
+          טבלת ברכות למאות מאכלים ומשקאות — ברכה ראשונה, ברכה אחרונה, ונוסח הברכות
+          המלא בניקוד.
+        </p>
+        <p style="margin-top:16px">
+          <a class="button button--gold" href="{{ url_for('berachot_page') }}">לטבלת הברכות</a>
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 class="card__title">איך המאגר בנוי</h3>
+        <p style="color:var(--ink-muted);font-size:15px">
+          כל שאלה ממוספרת במספר רץ אחד לכל האתר, ולכל שאלה עמוד משלה עם תשובה
+          ישירה, הרחבה, מקורות והבדלי מנהג בין אשכנז לספרד.
+        </p>
+        <p style="margin-top:16px">
+          <a class="button" href="{{ url_for('about') }}">אודות האתר</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
