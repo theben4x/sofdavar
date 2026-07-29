@@ -151,7 +151,18 @@ def main() -> int:
 
     total = dbmod.renumber_questions(conn)
     indexed = dbmod.rebuild_search_index(conn)
+
+    # WAL מהיר לכתיבה ולכן הוא נכון לבנייה — אבל הוא תכונה של *הקובץ*, לא של
+    # החיבור. כל קורא שפותח מסד במצב WAL חייב ליצור לידו ‎-shm ו-‎-wal, גם
+    # לשאילתת SELECT בלבד. בפרודקשן serverless מערכת הקבצים לקריאה בלבד,
+    # והפתיחה נכשלת בכל בקשה. אחרי הבנייה המסד ממילא לקריאה בלבד, ולכן
+    # מחזירים אותו ל-DELETE — שם קורא לא כותב כלום.
+    conn.commit()
+    conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    mode = conn.execute("PRAGMA journal_mode = DELETE").fetchone()[0]
     conn.close()
+    if mode != "delete":
+        print(f"  ⚠ journal_mode נשאר {mode} — פריסה לקריאה בלבד תיכשל")
 
     print(f"\nנבנה {DB_PATH}")
     print(f"  מספור רץ: 1..{total}")

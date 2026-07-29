@@ -1,8 +1,11 @@
 Flask>=3.0
 Markdown>=3.5
 
-# Windows/macOS אין בהם את מסד אזורי הזמן של IANA, ו-zoneinfo נשען עליו.
-tzdata; sys_platform != "linux"
+# zoneinfo נשען על מסד אזורי הזמן של IANA. ב-Windows/macOS הוא פשוט לא קיים,
+# ובתמונות לינוקס רזות (כולל סביבות serverless) הוא לא מובטח. app/zmanim.py
+# קורא ל-ZoneInfo("Asia/Jerusalem") *בזמן import*, ולכן חוסר שלו לא מפיל
+# עמוד אחד אלא את כל האפליקציה. מותקן בכל פלטפורמה — 350KB זה ביטוח זול.
+tzdata
 
 # רק לסקריפט האימות scripts/verify_zmanim.py. האתר עצמו לא פונה לרשת.
 requests>=2.31
