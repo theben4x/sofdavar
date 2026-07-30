@@ -16,11 +16,12 @@
 <div class="cat-divider" aria-hidden="true"><span></span><i></i><span></span></div>
 
 <section class="cat-panel{% if preview %} cat-panel--preview{% endif %}">
-  {# המיקום עבר ל-CSS: הוא נגזר מרדיוס הפאנל, ולכן אסור לו להיות מוקשח כאן. #}
-  <span class="cat-panel__corner cat-panel__corner--tr"></span>
-  <span class="cat-panel__corner cat-panel__corner--tl"></span>
-  <span class="cat-panel__corner cat-panel__corner--br"></span>
-  <span class="cat-panel__corner cat-panel__corner--bl"></span>
+  {# המיקום עבר ל-CSS: הוא נגזר מרדיוס הפאנל, ולכן אסור לו להיות מוקשח כאן.
+     אותו רכיב משמש גם את הלוחית שבגיבור. #}
+  <span class="corner-diamond corner-diamond--tr"></span>
+  <span class="corner-diamond corner-diamond--tl"></span>
+  <span class="corner-diamond corner-diamond--br"></span>
+  <span class="corner-diamond corner-diamond--bl"></span>
 
   <div class="cat-panel__head">
     <div class="cat-panel__eyebrow">{{ eyebrow }}</div>

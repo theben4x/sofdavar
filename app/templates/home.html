@@ -16,9 +16,16 @@
     <h1 class="hero__verse">{{ verse | emphasize(verse_emphasis) }}</h1>
     <p class="hero__source">{{ verse_source }}</p>
 
-    {# מה האתר עושה, במשפט אחד ובמסגרת, לפני שהגולש מקליד. הטקסט עצמו
-       יושב ב-config יחד עם הפסוק ושאר נוסחי הפתיחה. #}
-    <p class="hero__lede">{{ home_lede }}</p>
+    {# מה האתר עושה, בשורה אחת ובלוחית, לפני שהגולש מקליד. הטקסט עצמו
+       יושב ב-config יחד עם הפסוק ושאר נוסחי הפתיחה.
+       המעוינים בפינות הם אותו רכיב של פאנל הנושאים — ראה .corner-diamond. #}
+    <div class="hero__plaque">
+      <span class="corner-diamond corner-diamond--tr"></span>
+      <span class="corner-diamond corner-diamond--tl"></span>
+      <span class="corner-diamond corner-diamond--br"></span>
+      <span class="corner-diamond corner-diamond--bl"></span>
+      <p class="hero__lede">{{ home_lede }}</p>
+    </div>
 
     {# המונה המונפש שהיה כאן עבר אל תוך תיבת השאלה עצמה: אפקט ההקלדה של
        "למעלה מ-20,000 שאלות ותשובות" הוא הרמז שבשדה. ראה .search__hint. #}

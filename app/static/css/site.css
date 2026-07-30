@@ -496,39 +496,44 @@ img, svg { max-width: 100%; }
   font-weight: 500;
 }
 
-/* המשפט שמסביר מה האתר עושה, בין הפסוק לתיבה — במסגרת משלו, כדי שיהיה
-   אמירה ולא הערת שוליים.
-   44ch: המשפט נופל בדיוק לשתי שורות, ו-balance משווה את אורכן. רחב מזה
-   נוצרת שורה ארוכה ומתחתיה זנב קצר, וזה מה שנקרא לא סימטרי.
-   --ink ולא --ink-muted: אפור על נייר בז' מאבד נוכחות מהר.
-   ההיררכיה מול הפסוק נשמרת ממילא — הוא 40px של סריף, וזה 18px של סאנס. */
-.hero__lede {
+/* הלוחית שבין הפסוק לתיבה: אותה שפה של פאנל הנושאים — קו זהב, טבעת
+   פנימית דקה ומעוינים בפינות — בגודל של שורה אחת.
+   fit-content: הלוחית נמדדת לפי הטקסט ולא לפי העמוד, ולכן היא מתהדקת
+   סביבו ולא נראית כתיבה חצי ריקה. max-width נפרד ולא min(fit-content,100%):
+   fit-content אינו אורך, וה-min() כולו נפסל — הלוחית נמתחה לרוחב מלא.
+   בלי מילוי ובלי צל: התבקשה מסגרת ולא כרטיס, והרקע הבז' של הגיבור נשאר
+   נראה מבעדה. */
+.hero__plaque {
   position: relative;
-  max-width: 44ch;
+  width: fit-content;
+  max-width: 100%;
   margin: 26px auto 0;
-  padding: 17px 30px;
-  border: 1px solid var(--gold-ring);
+  padding: 13px 34px;
+  border: 1px solid var(--gold-royal);
   border-radius: var(--r-card);
-  /* אותו חומר של תיבת השאלה שמתחת — נייר לבן עם הרמה — ולכן השניים
-     נקראים כזוג. על --panel המסגרת נבלעה ברקע במקום לבלוט. */
-  background: var(--surface);
-  box-shadow: var(--shadow-royal);
-  font-size: 18px;
-  line-height: 1.7;
-  color: var(--ink);
-  text-wrap: balance;
 }
 
-/* טבעת פנימית דקה — אותה שפה של פאנל הנושאים שבהמשך העמוד, ומה שהופך
-   מלבן עם גבול למסגרת. inset:4px ולא 5px: המסגרת נמוכה מהפאנל, ובמרווח
-   גדול יותר שתי הטבעות נדבקות זו לזו. */
-.hero__lede::before {
+/* הטבעת הפנימית — הפרט שהופך גבול ללוחית. 5px, בדיוק כמו בפאנל. */
+.hero__plaque::before {
   content: "";
   position: absolute;
-  inset: 4px;
+  inset: 5px;
   border: .5px solid var(--line-soft);
-  border-radius: calc(var(--r-card) - 4px);
+  border-radius: calc(var(--r-card) - 5px);
   pointer-events: none;
+}
+
+/* סריף ולא סאנס: הלוחית היא אמירה, לא פסקה, והסריף מחזיר אותה אל הפסוק
+   שמעליה. הריווח הקל הוא מה שמונע ממנה להיקרא ככותרת משנה רגילה. */
+.hero__lede {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: .015em;
+  color: var(--ink);
+  text-wrap: balance;
 }
 
 /* ============================================================
@@ -987,7 +992,9 @@ img, svg { max-width: 100%; }
    ביותר של קשת ברדיוס r לפינת התיבה נמצאת ב-r(1-1/√2) ≈ 0.2929r פנימה,
    ושם מונח מרכז המעוין — לכן ההיסט הוא אותו ערך פחות חצי מרוחבו.
    נגזר מהרדיוס ולא מוקשח, כדי שהשניים לא ייפרדו בשינוי הבא. */
-.cat-panel__corner {
+/* רכיב משותף: פאנל הנושאים והלוחית שבגיבור. ההיסט נגזר מרדיוס התיבה
+   שמכילה אותו, ולכן די בהצבת --r-card נכון על ההורה. */
+.corner-diamond {
   position: absolute;
   width: 7px;
   height: 7px;
@@ -995,10 +1002,10 @@ img, svg { max-width: 100%; }
   transform: rotate(45deg);
   --corner-offset: calc(var(--r-card) * 0.2929 - 3.5px);
 }
-.cat-panel__corner--tr { top: var(--corner-offset); inset-inline-end: var(--corner-offset); }
-.cat-panel__corner--tl { top: var(--corner-offset); inset-inline-start: var(--corner-offset); }
-.cat-panel__corner--br { bottom: var(--corner-offset); inset-inline-end: var(--corner-offset); }
-.cat-panel__corner--bl { bottom: var(--corner-offset); inset-inline-start: var(--corner-offset); }
+.corner-diamond--tr { top: var(--corner-offset); inset-inline-end: var(--corner-offset); }
+.corner-diamond--tl { top: var(--corner-offset); inset-inline-start: var(--corner-offset); }
+.corner-diamond--br { bottom: var(--corner-offset); inset-inline-end: var(--corner-offset); }
+.corner-diamond--bl { bottom: var(--corner-offset); inset-inline-start: var(--corner-offset); }
 
 .cat-panel__head { text-align: center; margin-bottom: 22px; }
 
@@ -2007,15 +2014,8 @@ img, svg { max-width: 100%; }
   .hero__crown { width: 30px; height: 30px; margin-bottom: 12px; }
   .hero__verse { line-height: 1.7; max-width: 17ch; }
   .hero__source { margin-top: 10px; }
-  /* בטלפון המסגרת נמתחת לרוחב המלא ומתיישרת עם תיבת השאלה שמתחתיה;
-     ב-34ch היא הייתה צרה ממנה, ושתי מסגרות ברוחב שונה נקראות כתקלה. */
-  .hero__lede {
-    max-width: none;
-    margin-top: 16px;
-    padding: 14px 18px;
-    font-size: 16px;
-    line-height: 1.65;
-  }
+  .hero__plaque { margin-top: 16px; padding: 11px 22px; }
+  .hero__lede { font-size: 17px; }
   .search { margin-top: 16px; }
   .search__field { padding-inline: 16px; }
   .search__input { padding-block: 14px; }
