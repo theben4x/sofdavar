@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-{# סמל מוטבע: בלי קובץ נוסף ובלי בקשת רשת. בלעדיו הדפדפן מבקש
-   /favicon.ico ומקבל 404 של 8KB בכל ניווט. #A67C2E הוא --gold. #}
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23A67C2E' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 13.5 9.5 8l5 3L20 5.5 25.5 11l5-3-2.5 5.5Z'/%3E%3Cpath d='M20 19.5c-2.2-1.9-5.3-2.9-8.8-2.9H8V31h3.2c3.5 0 6.6 1 8.8 2.9'/%3E%3Cpath d='M20 19.5c2.2-1.9 5.3-2.9 8.8-2.9H32V31h-3.2c-3.5 0-6.6 1-8.8 2.9'/%3E%3Cpath d='M20 19.5v14.4'/%3E%3C/svg%3E">
+{# סמל האתר. היה כאן SVG מוטבע של קו-אמנות, והוחלף בסמל המצויר עצמו כדי
+   שהלשונית תראה את אותו לוגו שבכותרת. גם ככה זו בקשה אחת בלבד לכל ניווט,
+   ובלעדיה הדפדפן מבקש /favicon.ico ומקבל 404. #}
+<link rel="icon" type="image/png" sizes="32x32" href="{{ static_v('img/favicon-32.png') }}">
 
 {# ---- מטא לכל עמוד. המקבילה ל-generateMetadata: כותרת, תיאור, canonical ושיתוף ---- #}
 <title>{{ meta.title }}</title>
@@ -63,13 +64,11 @@
 <header class="topbar" id="topbar">
   <div class="wrap topbar__inner">
     <a class="logo" href="{{ url_for('home') }}">
-      <svg class="logo__mark" viewBox="0 0 40 40" fill="none" stroke="currentColor"
-           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M12 13.5 9.5 8l5 3L20 5.5 25.5 11l5-3-2.5 5.5Z"/>
-        <path d="M20 19.5c-2.2-1.9-5.3-2.9-8.8-2.9H8V31h3.2c3.5 0 6.6 1 8.8 2.9"/>
-        <path d="M20 19.5c2.2-1.9 5.3-2.9 8.8-2.9H32V31h-3.2c-3.5 0-6.6 1-8.8 2.9"/>
-        <path d="M20 19.5v14.4"/>
-      </svg>
+      {# alt ריק במתכוון: שם האתר כתוב ממש לידו בתוך אותו קישור, ותיאור
+         כפול היה נקרא פעמיים בקורא מסך. width/height מונעים קפיצה של
+         הכותרת עד שהקובץ מגיע. #}
+      <img class="logo__mark" src="{{ static_v('img/logo.png') }}" alt=""
+           width="38" height="38" fetchpriority="high">
       <span class="logo__text">
         <span class="logo__name">{{ site_name }}</span>
         <span class="logo__sub">שאלות ותשובות בהלכה</span>
@@ -161,13 +160,8 @@
     <div class="footer__grid">
       <div class="footer__brand">
         <div class="footer__logo">
-          <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.8"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 13.5 9.5 8l5 3L20 5.5 25.5 11l5-3-2.5 5.5Z"/>
-            <path d="M20 19.5c-2.2-1.9-5.3-2.9-8.8-2.9H8V31h3.2c3.5 0 6.6 1 8.8 2.9"/>
-            <path d="M20 19.5c2.2-1.9 5.3-2.9 8.8-2.9H32V31h-3.2c-3.5 0-6.6 1-8.8 2.9"/>
-            <path d="M20 19.5v14.4"/>
-          </svg>
+          {# אותו קובץ כמו בכותרת — הדפדפן כבר החזיק אותו במטמון. #}
+          <img src="{{ static_v('img/logo.png') }}" alt="" width="30" height="30">
           <span>{{ site_name }}</span>
         </div>
         <p class="footer__verse">{{ verse }}</p>

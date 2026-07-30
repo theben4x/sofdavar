@@ -344,11 +344,13 @@ img, svg { max-width: 100%; }
   text-decoration: none;
   flex: none;
 }
+/* הסמל הוא קובץ מצויר ולא SVG של currentColor, ולכן אין כאן color.
+   object-fit שומר עליו מרובע גם אם יוחלף בקובץ ביחס אחר. */
 .logo__mark {
   width: 38px;
   height: 38px;
   flex: none;
-  color: var(--gold);
+  object-fit: contain;
 }
 .logo__text { display: flex; flex-direction: column; line-height: 1; }
 .logo__name {
@@ -1787,7 +1789,7 @@ img, svg { max-width: 100%; }
   gap: 10px;
   margin-bottom: 14px;
 }
-.footer__logo svg { width: 30px; height: 30px; flex: none; color: var(--gold); }
+.footer__logo img { width: 30px; height: 30px; flex: none; object-fit: contain; }
 .footer__logo span {
   font-family: var(--font-serif);
   font-size: 20px;
@@ -1999,7 +2001,7 @@ img, svg { max-width: 100%; }
     margin-bottom: 22px;
   }
   .footer__logo { margin-bottom: 10px; }
-  .footer__logo svg { width: 26px; height: 26px; }
+  .footer__logo img { width: 26px; height: 26px; }
   .footer__logo span { font-size: 18px; }
   .footer__verse { font-size: 13.5px; line-height: 1.75; }
   .footer__source { margin-top: 6px; font-size: 11.5px; }
