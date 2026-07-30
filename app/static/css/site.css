@@ -1201,6 +1201,8 @@ img, svg { max-width: 100%; }
 /* מוסתר עד שה-JS מסמן has-js על השורש — כפתור העתקה בלי JS הוא כפתור מת. */
 .js-only { display: none; }
 .has-js .js-only { display: inline-flex; }
+/* ההפך: כפתור "הצג" של בורר העיר מיותר כשה-JS שולח את הטופס לבד. */
+.has-js .js-hidden { display: none; }
 /* hidden חייב לגבור על ה-display שלמעלה, אחרת כפתור השיתוף היה מוצג
    גם בדפדפן בלי Web Share API. */
 .has-js .js-only[hidden] { display: none; }
@@ -1366,6 +1368,72 @@ img, svg { max-width: 100%; }
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 12px;
+}
+
+/* ------------------------------------------------------------
+   כרטיס "השבת הקרובה" בדף הבית
+   מחזיק את מה שהיה מפוזר בשלושה מקומות: פרשת השבוע (מהרצועה השחורה
+   שמעל הפוטר), הזמנים, ובחירת העיר (שהייתה רק בעמוד הזמנים).
+   ------------------------------------------------------------ */
+.shabbat-card__when {
+  margin: -6px 0 14px;
+  font-size: 14.5px;
+  color: var(--ink-muted);
+}
+.shabbat-card__when b {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  color: var(--ink);
+}
+
+/* התווית והבורר באותה שורה: "זמני השבת ב[ ירושלים ▾ ]" נקרא כמשפט אחד. */
+.shabbat-card__picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.shabbat-card__picker select {
+  flex: 1;
+  min-width: 140px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--r-tile);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+}
+.shabbat-card__picker .button { padding: 8px 16px; font-size: 14px; }
+
+.shabbat-card__times li { align-items: center; }
+
+.shabbat-time__label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* המקור של המספר. 12px ולא קטן מזה — מתחת לזה זה כבר לא נקרא. */
+.shabbat-time__label small {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+
+.shabbat-time__value {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-feature-settings: "tnum";   /* בלי זה השורות לא מתיישרות זו מול זו */
+}
+
+.shabbat-card__source {
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-muted);
 }
 
 .panel-list { list-style: none; margin: 0; padding: 0; }
@@ -1695,62 +1763,13 @@ img, svg { max-width: 100%; }
    ============================================================ */
 /* צבע קבוע ולא --ink: הרצועה שחורה בשתי הערכות בכוונה, והיא הדבר היחיד
    באתר שלא מתהפך. לכן גם הטקסט שעליה קבוע ולא נגזר מטוקני הערכה. */
-.ribbon {
-  margin-top: auto;          /* דוחף את הרצועה+פוטר לתחתית בעמוד קצר */
-  background: #14140F;
-  color: #F0EEE6;
-  border-top: 1px solid var(--gold);
-}
-
-.ribbon__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 6px 28px;
-  padding-block: 13px;
-}
-
-.ribbon__item {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin: 0;
-  min-width: 0;
-}
-/* דוחף את הפריט השני לקצה גם כשהראשון חסר (שבת שאין בה פרשה). */
-.ribbon__item--end { margin-inline-start: auto; }
-
-.ribbon__label {
-  flex: none;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .16em;
-  /* #B8912E על #14140F נותן 5.6:1 — עובר AA גם בגודל הזה. */
-  color: #B8912E;
-}
-
-.ribbon__value {
-  font-family: var(--font-serif);
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.35;
-}
-.ribbon__value--num { font-feature-settings: "tnum"; }
-
-@media (max-width: 560px) {
-  /* בטלפון שתי הפריטים לא נכנסים בשורה — עמודה אחת, ובלי ה-auto שדוחף
-     את השני לקצה, אחרת הוא נשאר תלוי בצד. */
-  .ribbon__inner { flex-direction: column; align-items: stretch; gap: 8px; }
-  .ribbon__item { justify-content: space-between; }
-  .ribbon__item--end { margin-inline-start: 0; }
-  .ribbon__value { font-size: 15px; }
-}
-
 /* ============================================================
    פוטר
    ============================================================ */
 .footer {
+  /* דוחף את הפוטר לתחתית המסך בעמוד קצר (הגוף הוא flex עם 100vh).
+     ה-auto הזה ישב על הרצועה השחורה שהייתה מעליו, ועבר לכאן איתה. */
+  margin-top: auto;
   padding: 48px 0 34px;
   border-top: 1px solid var(--rule);
   background: var(--surface);

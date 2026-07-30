@@ -88,6 +88,18 @@
     }
   }
 
+  /* ------------------------------------------------- בורר עם שליחה מיידית */
+
+  /* בחירה מרשימה היא כבר האישור — לחיצה נוספת על "הצג" מיותרת. הכפתור
+     עצמו נשאר ב-HTML ומוסתר ב-CSS דרך has-js, כדי שבלי JavaScript הטופס
+     יישאר טופס רגיל שאפשר לשלוח. */
+  var autoSubmit = document.querySelectorAll('select[data-auto-submit]');
+  Array.prototype.forEach.call(autoSubmit, function (select) {
+    select.addEventListener('change', function () {
+      if (select.form) select.form.submit();
+    });
+  });
+
   /* ------------------------------------------------------------ תפריט בנייד */
 
   var navToggle = document.getElementById('nav-toggle');

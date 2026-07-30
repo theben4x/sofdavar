@@ -131,30 +131,9 @@
   {% block content %}{% endblock %}
 </main>
 
-{# רצועה שחורה מעל הפוטר: פרשת השבוע בימין, כניסת השבת בירושלים בשמאל.
-   שני הנתונים מגיעים מאותה שבת (ראה inject_globals), ולכן הם לא יכולים
-   להצביע על שבועות שונים. #}
-<aside class="ribbon" aria-label="פרשת השבוע וזמני השבת">
-  <div class="wrap ribbon__inner">
-    {% if strip_parasha %}
-    <p class="ribbon__item">
-      <span class="ribbon__label">פרשת השבוע</span>
-      <span class="ribbon__value">{{ strip_parasha }}</span>
-    </p>
-    {% endif %}
-
-    {% if strip_shabbat.entry %}
-    <p class="ribbon__item ribbon__item--end">
-      <span class="ribbon__label">כניסת השבת בירושלים</span>
-      <time class="ribbon__value ribbon__value--num"
-            datetime="{{ strip_shabbat.entry.strftime('%Y-%m-%dT%H:%M') }}">
-        {{ strip_shabbat.entry.strftime('%H:%M') }}
-      </time>
-    </p>
-    {% endif %}
-  </div>
-</aside>
-
+{# הרצועה השחורה שהייתה כאן (פרשת השבוע + כניסת שבת בירושלים) אוחדה לתוך
+   כרטיס "השבת הקרובה" בדף הבית: שם הפרשה והזמנים יושבים יחד, ולפי העיר
+   שהגולש בחר ולא לפי ירושלים בלבד. #}
 <footer class="footer">
   <div class="wrap">
     <div class="footer__grid">

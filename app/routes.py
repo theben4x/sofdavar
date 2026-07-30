@@ -12,8 +12,8 @@ from typing import Iterable
 from urllib.parse import quote
 
 from flask import (
-    Flask, Response, abort, current_app, jsonify, redirect, render_template,
-    request, url_for,
+    Flask, Response, abort, current_app, jsonify, make_response, redirect,
+    render_template, request, url_for,
 )
 from markupsafe import Markup, escape
 
@@ -37,6 +37,44 @@ def _meta(title: str, description: str, path: str, **extra) -> dict:
         "path": path,
         **extra,
     }
+
+
+#: העיר האחרונה שנבחרה. העדפת תצוגה בלבד — אין בה מידע מזהה.
+CITY_COOKIE = "sofdavar-city"
+CITY_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
+
+
+def _selected_city() -> tuple[zmanim.City, bool]:
+    """העיר שלפיה מוצגים הזמנים, והאם היא נבחרה עכשיו.
+
+    הסדר: פרמטר בכתובת (הבחירה הנוכחית), אחריו העוגייה (הבחירה הקודמת),
+    ולבסוף ירושלים. הפרמטר קודם כדי שקישור לעיר מסוימת יעבוד גם למי
+    שכבר בחר אחרת.
+    """
+    requested = (request.args.get("city") or "").strip()
+    if requested in zmanim.CITIES_BY_SLUG:
+        return zmanim.CITIES_BY_SLUG[requested], True
+    return zmanim.get_city(request.cookies.get(CITY_COOKIE)), False
+
+
+def _remember_city(html: str, city: zmanim.City, chosen: bool) -> Response:
+    """שומר את הבחירה, כדי שהיא תחזיק גם בעמוד הבא ובביקור הבא.
+
+    ``Vary: Cookie`` חובה: אותה כתובת בדיוק מחזירה זמנים אחרים לפי
+    העוגייה, ובלעדיו מטמון משותף היה מגיש את ירושלים למי שבחר חיפה.
+    """
+    response = make_response(html)
+    response.headers["Vary"] = "Cookie"
+    if chosen:
+        response.set_cookie(
+            CITY_COOKIE,
+            city.slug,
+            max_age=CITY_COOKIE_MAX_AGE,
+            samesite="Lax",
+            httponly=True,
+            secure=request.is_secure,
+        )
+    return response
 
 
 def _breadcrumbs(*items: tuple[str, str]) -> dict:
@@ -63,10 +101,6 @@ def register_routes(app: Flask) -> None:
 
     @app.context_processor
     def inject_globals() -> dict:
-        # הרצועה שמעל הפוטר יושבת ב-base.html ולכן מוצגת בכל עמוד. שני
-        # הנתונים נלקחים מאותה שבת אחת, אחרת בערב שבת אחרי הצאת היו
-        # מוצגים פרשה של שבוע אחד וזמן הדלקה של אחר.
-        shabbat = zmanim.upcoming_shabbat(zmanim.DEFAULT_CITY)
         return {
             "site_name": app.config["SITE_NAME"],
             "site_tagline": app.config["SITE_TAGLINE"],
@@ -78,8 +112,6 @@ def register_routes(app: Flask) -> None:
             "nav_categories": db.list_categories(),
             "current_year": date.today().year,
             "current_path": request.path,
-            "strip_parasha": parasha.label(shabbat["saturday"]),
-            "strip_shabbat": shabbat,
         }
 
     @app.template_global()
@@ -117,7 +149,9 @@ def register_routes(app: Flask) -> None:
     def home():
         total = db.question_count()
         meta_copy = db.get_meta("copy", {}) or {}
-        return render_template(
+        city, chosen = _selected_city()
+        shabbat = zmanim.upcoming_shabbat(city)
+        html = render_template(
             "home.html",
             meta=_meta(
                 meta_copy.get("home_title") or app.config["SITE_NAME"],
@@ -141,8 +175,11 @@ def register_routes(app: Flask) -> None:
             categories=db.list_categories(),
             total_questions=total,
             question_of_day=db.question_of_the_day(date.today()),
-            shabbat=zmanim.upcoming_shabbat(zmanim.DEFAULT_CITY),
+            shabbat=shabbat,
+            shabbat_parasha=parasha.label(shabbat["saturday"]),
+            cities=zmanim.CITIES,
         )
+        return _remember_city(html, city, chosen)
 
     @app.route("/about")
     def about():
@@ -210,7 +247,9 @@ def register_routes(app: Flask) -> None:
 
     @app.route("/zmanim")
     def zmanim_page():
-        city = zmanim.get_city(request.args.get("city"))
+        # אותה בחירת עיר של דף הבית, ובאותה עוגייה — מי שבחר שם לא צריך
+        # לבחור שוב כאן.
+        city, chosen = _selected_city()
         try:
             day = date.fromisoformat(request.args["date"]) if "date" in request.args else None
         except ValueError:
@@ -218,7 +257,7 @@ def register_routes(app: Flask) -> None:
         day = day or datetime.now(zmanim.ISRAEL_TZ).date()
 
         meta_copy = db.get_meta("copy", {}) or {}
-        return render_template(
+        html = render_template(
             "zmanim.html",
             meta=_meta(
                 f"זמני היום ב{city.name}",
@@ -234,6 +273,7 @@ def register_routes(app: Flask) -> None:
             data=zmanim.compute(day, city),
             shabbat=zmanim.upcoming_shabbat(city),
         )
+        return _remember_city(html, city, chosen)
 
     # -----------------------------------------------------------------------
     # מה נברך

@@ -59,31 +59,81 @@
 <section class="section">
   <div class="wrap">
     <div class="grid-cards">
-      <div class="card">
-        <h3 class="card__title">השבת הקרובה ב{{ shabbat.city.name }}</h3>
-        <ul class="panel-list">
+      {# הכרטיס מחזיק עכשיו גם את פרשת השבוע ואת בחירת העיר — מה שהיה
+         קודם ברצועה השחורה שמעל הפוטר, ובכפתור שמתחת.
+         העוגן קיים כדי שהטופס יחזיר את הגולש אל הכרטיס ולא אל ראש העמוד. #}
+      <div class="card shabbat-card" id="shabbat">
+        <h3 class="card__title">השבת הקרובה</h3>
+        <p class="shabbat-card__when">
+          {% if shabbat_parasha %}<b>{{ shabbat_parasha }}</b> · {% endif %}
+          {{ shabbat.hebrew_date }}
+        </p>
+
+        {% if shabbat.holidays %}
+        <div class="chip-row" style="margin-bottom:14px">
+          {% for holiday in shabbat.holidays %}
+          <span class="chip chip--holiday">{{ holiday.name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {# GET רגיל: בלי JavaScript לוחצים "הצג", ואיתו הבחירה נשלחת מיד
+           והכפתור מיותר. הבחירה נשמרת בעוגייה, ולכן היא מחזיקה גם בעמוד
+           הזמנים ובביקור הבא. #}
+        <form class="shabbat-card__picker" method="get"
+              action="{{ url_for('home') }}#shabbat">
+          <label class="field__label" for="shabbat-city">זמני השבת ב</label>
+          <select id="shabbat-city" name="city" data-auto-submit>
+            {% for option in cities %}
+            <option value="{{ option.slug }}"
+                    {% if option.slug == shabbat.city.slug %}selected{% endif %}>
+              {{ option.name }}
+            </option>
+            {% endfor %}
+          </select>
+          <button class="button js-hidden" type="submit">הצג</button>
+        </form>
+
+        <ul class="panel-list shabbat-card__times">
           <li>
-            <span style="flex:1">כניסת שבת</span>
-            <b style="font-family:var(--font-serif);font-feature-settings:'tnum'">
+            <span class="shabbat-time__label">
+              כניסת שבת
+              <small>{{ shabbat.city.candle_offset }} דקות לפני השקיעה{% if shabbat.city.candle_note %} · {{ shabbat.city.candle_note }}{% endif %}</small>
+            </span>
+            <b class="shabbat-time__value">
               {{ shabbat.entry.strftime('%H:%M') if shabbat.entry else '—' }}
             </b>
           </li>
           <li>
-            <span style="flex:1">צאת שבת</span>
-            <b style="font-family:var(--font-serif);font-feature-settings:'tnum'">
+            <span class="shabbat-time__label">
+              צאת שבת
+              <small>צאת הכוכבים · 8.5° מתחת לאופק</small>
+            </span>
+            <b class="shabbat-time__value">
               {{ shabbat.exit.strftime('%H:%M') if shabbat.exit else '—' }}
             </b>
           </li>
           <li>
-            <span style="flex:1">רבנו תם</span>
-            <b style="font-family:var(--font-serif);font-feature-settings:'tnum'">
+            <span class="shabbat-time__label">
+              רבנו תם
+              <small>72 דקות אחרי השקיעה</small>
+            </span>
+            <b class="shabbat-time__value">
               {{ shabbat.exit_rabbeinu_tam.strftime('%H:%M') if shabbat.exit_rabbeinu_tam else '—' }}
             </b>
           </li>
         </ul>
+
+        {# מאיפה המספרים. בלי זה הם נראים כמו נתון שרירותי. #}
+        <p class="shabbat-card__source">
+          החישוב אסטרונומי, לפי קו הרוחב והאורך של {{ shabbat.city.name }} ובגובה
+          פני הים. הדלקת הנרות היא מנהג המקום. למעשה — כמנהג הקהילה.
+        </p>
+
         <p style="margin-top:16px">
-          <a class="button button--gold" href="{{ url_for('zmanim_page') }}">
-            כל הזמנים ובחירת עיר
+          <a class="button button--gold"
+             href="{{ url_for('zmanim_page', city=shabbat.city.slug) }}">
+            לכל הזמנים
           </a>
         </p>
       </div>
