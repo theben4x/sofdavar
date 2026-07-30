@@ -492,6 +492,19 @@ img, svg { max-width: 100%; }
   font-weight: 500;
 }
 
+/* שלוש השורות שמסבירות מה האתר עושה, בין הפסוק לתיבה.
+   46ch נותן שלוש שורות במסך רחב — רחב מזה והמשפט מתפרק לשתיים ארוכות
+   שהעין לא מסיימת. balance מונע מילה בודדת בשורה האחרונה.
+   --ink-muted ולא --ink: הפסוק הוא הקול הראשי, וזה ההסבר שמתחתיו. */
+.hero__lede {
+  max-width: 46ch;
+  margin: 22px auto 0;
+  font-size: 16.5px;
+  line-height: 1.85;
+  color: var(--ink-muted);
+  text-wrap: balance;
+}
+
 /* ============================================================
    חיפוש — תבנית combobox נגישה
    ============================================================ */
@@ -1881,6 +1894,13 @@ img, svg { max-width: 100%; }
   .hero__crown { width: 30px; height: 30px; margin-bottom: 12px; }
   .hero__verse { line-height: 1.7; max-width: 17ch; }
   .hero__source { margin-top: 10px; }
+  /* 34ch כדי שהמשפט לא יימתח על חמש שורות במסך של טלפון. */
+  .hero__lede {
+    max-width: 34ch;
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.7;
+  }
   .search { margin-top: 16px; }
   .search__field { padding-inline: 16px; }
   .search__input { padding-block: 14px; }
