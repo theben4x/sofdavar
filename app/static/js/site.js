@@ -88,6 +88,29 @@
     }
   }
 
+  /* ------------------------------------------------ פתיחת רשת הנושאים */
+
+  var catMore = document.getElementById('cat-more');
+  if (catMore) {
+    var catPanel = catMore.closest('.cat-panel');
+    var catLabel = catMore.querySelector('.cat-more__label');
+    // התוויות מגיעות מה-HTML ולא מכאן, כדי שכל נוסח האתר יישאר בתבניות.
+    var labelClosed = catLabel.textContent;
+
+    catMore.addEventListener('click', function () {
+      var open = !catPanel.classList.contains('is-open');
+      catPanel.classList.toggle('is-open', open);
+      catMore.setAttribute('aria-expanded', String(open));
+      catLabel.textContent = open ? catMore.dataset.labelOpen : labelClosed;
+
+      // בסגירה הרשת מתקצרת ומה שמתחתיה קופץ למעלה. אם הכפתור נשאר מעל
+      // קצה המסך, הגלילה מוחזרת אליו כדי שהעין לא תאבד את המקום.
+      if (!open && catMore.getBoundingClientRect().top < 0) {
+        catPanel.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }
+    });
+  }
+
   /* ------------------------------------------------- בורר עם שליחה מיידית */
 
   /* בחירה מרשימה היא כבר האישור — לחיצה נוספת על "הצג" מיותרת. הכפתור

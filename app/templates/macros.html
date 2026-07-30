@@ -12,10 +12,10 @@
 
 {# רשת הקטגוריות המלכותית — מועתקת מ-DES/category-grid-royal.html.
    הכותרת יושבת בתוך הפאנל ולא מעליו, ולכן העמוד הקורא לא צריך כותרת נוספת. #}
-{% macro category_grid(heading='דפדוף לפי קטגוריה', eyebrow='המאגר', categories=[]) %}
+{% macro category_grid(heading='דפדוף לפי קטגוריה', eyebrow='המאגר', categories=[], preview=false) %}
 <div class="cat-divider" aria-hidden="true"><span></span><i></i><span></span></div>
 
-<section class="cat-panel">
+<section class="cat-panel{% if preview %} cat-panel--preview{% endif %}">
   {# המיקום עבר ל-CSS: הוא נגזר מרדיוס הפאנל, ולכן אסור לו להיות מוקשח כאן. #}
   <span class="cat-panel__corner cat-panel__corner--tr"></span>
   <span class="cat-panel__corner cat-panel__corner--tl"></span>
@@ -27,7 +27,7 @@
     <h2 class="cat-panel__title">{{ heading }}</h2>
   </div>
 
-  <div class="cat-grid">
+  <div class="cat-grid" id="cat-grid">
     {% for category in categories %}
     <a class="cat-tile" href="/{{ category.slug }}" style="--i:{{ loop.index }}">
       <span class="cat-tile__icon">
@@ -40,6 +40,22 @@
     </a>
     {% endfor %}
   </div>
+
+  {# שורה אחת של נושאים, והשאר נפתחים בלחיצה — עשרה אריחים פרשו את דף
+     הבית הרבה למטה. כל האריחים נמצאים ב-HTML (גם מנוע חיפוש רואה את
+     כולם), וההסתרה היא CSS בלבד. הכפתור מוצג רק כשיש JavaScript: בלעדיו
+     הרשת נשארת פתוחה, כי עדיף להראות הכל מלהסתיר בלי דרך לחשוף. #}
+  {% if preview and categories | length > 4 %}
+  <button class="cat-more" type="button" id="cat-more"
+          aria-expanded="false" aria-controls="cat-grid"
+          data-label-open="הצג פחות">
+    <span class="cat-more__label">כל {{ categories | length }} הנושאים</span>
+    <svg class="cat-more__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </button>
+  {% endif %}
 </section>
 {% endmacro %}
 

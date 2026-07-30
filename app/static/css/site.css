@@ -998,11 +998,63 @@ img, svg { max-width: 100%; }
   margin: 0;
 }
 
+/* 230px ולא 300px: הרשת במסך רחב היא 970px, ובמינימום של 300 נכנסו בה
+   שלוש עמודות בלבד. 230 נותן ארבע (4×232+42=970) — שהן שורת התצוגה
+   המקדימה בדף הבית, וגם מקצרות את הרשת הפתוחה מארבע שורות לשלוש.
+   חמש לא ייכנסו לעולם: הפאנל חסום ב-1120px, ושם צריך 1206. שם הקטגוריה
+   הארוך ביותר ("יום הכיפורים") נכנס ב-139px שנשארים לטקסט באריח. */
 .cat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 14px;
 }
+
+/* ------------------------------------------------------------
+   תצוגה מקדימה: שורה אחת של נושאים + כפתור פתיחה (דף הבית בלבד;
+   בעמוד "אודות" הרשימה המלאה היא כל הפואנטה).
+   ------------------------------------------------------------ */
+.has-js .cat-panel--preview:not(.is-open) .cat-tile:nth-child(n+5) { display: none; }
+
+/* התצוגה המקדימה היא תמיד שורות שלמות, ולכן מספר האריחים נגזר ממספר
+   העמודות ולא הפוך: ארבע עמודות → ארבעה (שורה אחת), שתיים → ארבעה (שתי
+   שורות), ושלוש → שלושה, אחרת נשאר אריח בודד בשורה שנייה.
+   הגבולות נמדדו בדפדפן על הרשת עצמה: 2 עמודות עד 829px, 3 עד 1079px,
+   ומשם 4. הם נגזרים מ-minmax(230px) שלמעלה — אם הוא משתנה, למדוד שוב. */
+@media (min-width: 830px) and (max-width: 1079px) {
+  .has-js .cat-panel--preview:not(.is-open) .cat-tile:nth-child(n+4) { display: none; }
+}
+
+/* בפתיחה נחשפים כל השאר בבת אחת, וב-55ms לאריח האחרון היה מגיע רק אחרי
+   שנייה ויותר. 18ms שומר על תחושת המפל בלי להאט את הפתיחה. הארבעה
+   הראשונים כבר סיימו את האנימציה מזמן, ולכן קיצור ההשהיה לא מחזיר אותם. */
+.cat-panel--preview.is-open .cat-tile { animation-delay: calc(var(--i, 0) * 18ms); }
+
+.cat-more {
+  /* בלי JavaScript הכפתור לא מוצג והרשת נשארת פתוחה במלואה. */
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin: 18px auto 0;
+  padding: 9px 20px;
+  background: transparent;
+  border: .5px solid var(--line-tile);
+  border-radius: 999px;
+  color: var(--gold-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .25s, background .25s;
+}
+.has-js .cat-more { display: flex; }
+.cat-more:hover { border-color: var(--gold-royal); background: var(--tile-hover); }
+
+.cat-more__chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform .25s ease;
+}
+.cat-panel.is-open .cat-more__chevron { transform: rotate(180deg); }
 
 .cat-tile {
   position: relative;

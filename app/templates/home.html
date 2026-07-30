@@ -29,7 +29,7 @@
 <section class="section" id="categories">
   <div class="wrap">
     {# הפאנל נושא את הכותרת ואת המפריד בעצמו — אין צורך בכותרת מקטע נוספת. #}
-    {{ category_grid(categories=categories) }}
+    {{ category_grid(categories=categories, preview=true) }}
     <p style="text-align:center;margin-top:18px">
       <a class="section__link" href="{{ url_for('search_page') }}">
         שאלו אותי <span class="arrow-glyph" aria-hidden="true">←</span>
