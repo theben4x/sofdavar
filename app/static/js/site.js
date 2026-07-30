@@ -378,10 +378,15 @@
          translateY(-50%). offsetWidth הוא מידת פריסה, שקופה ל-transform,
          וגם כבר מעגלת כלפי מעלה. 3px נוספים הם רוחב הסמן. */
       var measureHint = function () {
-        hint.style.setProperty('--tw', hintLine.offsetWidth + 3 + 'px');
+        var width = hintLine.offsetWidth;
+        // אפס = הרמז אינו מרונדר כרגע (hidden לפני ההתחלה, או display:none
+        // בזמן שיש טקסט בשדה). מדידה כזאת הייתה נועלת --tw על 3px.
+        if (!width) return;
+        hint.style.setProperty('--tw', width + 3 + 'px');
       };
 
       var startHint = function () {
+        hint.hidden = false;
         measureHint();
         // רק כאן מוחקים את ה-placeholder. עד לרגע הזה הוא הרמז היחיד,
         // ומחיקה מוקדמת הייתה משאירה שדה ריק עד שהפונטים נטענים.
@@ -401,7 +406,6 @@
       // מחכים לגלילה אל השדה — בעמוד הקטגוריה הוא באמצע העמוד, ואנימציה
       // שרצה מחוץ למסך פשוט הולכת לאיבוד.
       var observeHint = function () {
-        measureHint();
         if (!window.IntersectionObserver) { startHint(); return; }
         var io = new IntersectionObserver(function (entries) {
           if (!entries[0].isIntersecting) return;

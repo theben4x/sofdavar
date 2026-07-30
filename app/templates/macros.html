@@ -69,8 +69,11 @@
              {% if autofocus %}autofocus{% endif %}>
       {% if not value %}
       {# aria-hidden: זו כפילות של ה-placeholder, וקורא מסך כבר מקבל את
-         הטקסט מהתווית הנסתרת. #}
-      <span class="search__hint" id="search-hint" aria-hidden="true">
+         הטקסט מהתווית הנסתרת.
+         hidden: כלל של הדפדפן עצמו, ולכן הוא תופס גם כשה-CSS של האתר לא
+         הגיע או שנתקע במטמון בגרסה ישנה. site.js מסיר אותו באותה שורה
+         שבה הוא מוחק את ה-placeholder — כך שבכל מצב מוצג רמז אחד בלבד. #}
+      <span class="search__hint" id="search-hint" aria-hidden="true" hidden>
         <span class="search__hint-line">למעלה מ־<b class="search__hint-num">{{ total }}</b><span class="search__hint-word">שאלות</span><span class="search__hint-tail"> ותשובות</span></span>
       </span>
       {% endif %}
