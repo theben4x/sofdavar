@@ -478,9 +478,11 @@ img, svg { max-width: 100%; }
   font-feature-settings: "kern";
 }
 
-/* שני הציוויים שבפסוק. --gold-deep ולא --gold: הוא מתהפך בין הערכות
-   ונשאר קריא בשתיהן, ובבהיר הוא נותן 6.8:1 על הנייר. */
-.hero__verse .verse-em {
+/* שני הציוויים שבפסוק, ואיתם הביטוי המודגש בשורות הפתיחה.
+   --gold-deep ולא --gold: הוא מתהפך בין הערכות ונשאר קריא בשתיהן,
+   ובבהיר הוא נותן 6.8:1 על הנייר. */
+.hero__verse .verse-em,
+.hero__lede .verse-em {
   font-style: normal;
   font-weight: 700;
   color: var(--gold-deep);
@@ -497,13 +499,15 @@ img, svg { max-width: 100%; }
 /* שלוש השורות שמסבירות מה האתר עושה, בין הפסוק לתיבה.
    46ch נותן שלוש שורות במסך רחב — רחב מזה והמשפט מתפרק לשתיים ארוכות
    שהעין לא מסיימת. balance מונע מילה בודדת בשורה האחרונה.
-   --ink-muted ולא --ink: הפסוק הוא הקול הראשי, וזה ההסבר שמתחתיו. */
+   --ink ולא --ink-muted: אפור מדי נקרא כהערת שוליים, והמשפט הזה הוא
+   ההסבר היחיד באתר למי שנחת בו לראשונה. ההיררכיה מול הפסוק נשמרת
+   ממילא — הוא 40px של סריף, וזה 17.5px של סאנס במשקל רגיל. */
 .hero__lede {
   max-width: 46ch;
   margin: 22px auto 0;
-  font-size: 16.5px;
-  line-height: 1.85;
-  color: var(--ink-muted);
+  font-size: 17.5px;
+  line-height: 1.8;
+  color: var(--ink);
   text-wrap: balance;
 }
 
@@ -700,6 +704,7 @@ img, svg { max-width: 100%; }
    במונה. במצב בהיר הם נשארים --gold-deep.
    ============================================================ */
 [data-theme="dark"] .hero__verse .verse-em,
+[data-theme="dark"] .hero__lede .verse-em,
 [data-theme="dark"] .hero__source { color: var(--ctr-num); }
 
 [data-theme="dark"] .search__submit { background: var(--ctr-num); }
@@ -1900,7 +1905,7 @@ img, svg { max-width: 100%; }
   .hero__lede {
     max-width: 34ch;
     margin-top: 14px;
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.7;
   }
   .search { margin-top: 16px; }
