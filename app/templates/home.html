@@ -16,9 +16,9 @@
     <h1 class="hero__verse">{{ verse | emphasize(verse_emphasis) }}</h1>
     <p class="hero__source">{{ verse_source }}</p>
 
-    {# מה האתר עושה, בשלוש שורות, לפני שהגולש מקליד. הטקסט עצמו יושב
-       ב-config יחד עם הפסוק ושאר נוסחי הפתיחה. #}
-    <p class="hero__lede">{{ home_lede | emphasize(home_lede_emphasis) }}</p>
+    {# מה האתר עושה, במשפט אחד ובמסגרת, לפני שהגולש מקליד. הטקסט עצמו
+       יושב ב-config יחד עם הפסוק ושאר נוסחי הפתיחה. #}
+    <p class="hero__lede">{{ home_lede }}</p>
 
     {# המונה המונפש שהיה כאן עבר אל תוך תיבת השאלה עצמה: אפקט ההקלדה של
        "למעלה מ-20,000 שאלות ותשובות" הוא הרמז שבשדה. ראה .search__hint. #}

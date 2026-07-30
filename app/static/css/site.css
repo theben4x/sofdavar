@@ -478,11 +478,11 @@ img, svg { max-width: 100%; }
   font-feature-settings: "kern";
 }
 
-/* שני הציוויים שבפסוק, ואיתם הביטוי המודגש בשורות הפתיחה.
+/* הדגשת מילים בתוך הפסוק. כרגע VERSE_EMPHASIS ריק (התבקש צבע אחיד),
+   והכלל נשאר כדי שהחזרתה תהיה שינוי בקונפיג בלבד.
    --gold-deep ולא --gold: הוא מתהפך בין הערכות ונשאר קריא בשתיהן,
    ובבהיר הוא נותן 6.8:1 על הנייר. */
-.hero__verse .verse-em,
-.hero__lede .verse-em {
+.hero__verse .verse-em {
   font-style: normal;
   font-weight: 700;
   color: var(--gold-deep);
@@ -496,19 +496,39 @@ img, svg { max-width: 100%; }
   font-weight: 500;
 }
 
-/* שלוש השורות שמסבירות מה האתר עושה, בין הפסוק לתיבה.
-   46ch נותן שלוש שורות במסך רחב — רחב מזה והמשפט מתפרק לשתיים ארוכות
-   שהעין לא מסיימת. balance מונע מילה בודדת בשורה האחרונה.
-   --ink ולא --ink-muted: אפור מדי נקרא כהערת שוליים, והמשפט הזה הוא
-   ההסבר היחיד באתר למי שנחת בו לראשונה. ההיררכיה מול הפסוק נשמרת
-   ממילא — הוא 40px של סריף, וזה 17.5px של סאנס במשקל רגיל. */
+/* המשפט שמסביר מה האתר עושה, בין הפסוק לתיבה — במסגרת משלו, כדי שיהיה
+   אמירה ולא הערת שוליים.
+   44ch: המשפט נופל בדיוק לשתי שורות, ו-balance משווה את אורכן. רחב מזה
+   נוצרת שורה ארוכה ומתחתיה זנב קצר, וזה מה שנקרא לא סימטרי.
+   --ink ולא --ink-muted: אפור על נייר בז' מאבד נוכחות מהר.
+   ההיררכיה מול הפסוק נשמרת ממילא — הוא 40px של סריף, וזה 18px של סאנס. */
 .hero__lede {
-  max-width: 46ch;
-  margin: 22px auto 0;
-  font-size: 17.5px;
-  line-height: 1.8;
+  position: relative;
+  max-width: 44ch;
+  margin: 26px auto 0;
+  padding: 17px 30px;
+  border: 1px solid var(--gold-ring);
+  border-radius: var(--r-card);
+  /* אותו חומר של תיבת השאלה שמתחת — נייר לבן עם הרמה — ולכן השניים
+     נקראים כזוג. על --panel המסגרת נבלעה ברקע במקום לבלוט. */
+  background: var(--surface);
+  box-shadow: var(--shadow-royal);
+  font-size: 18px;
+  line-height: 1.7;
   color: var(--ink);
   text-wrap: balance;
+}
+
+/* טבעת פנימית דקה — אותה שפה של פאנל הנושאים שבהמשך העמוד, ומה שהופך
+   מלבן עם גבול למסגרת. inset:4px ולא 5px: המסגרת נמוכה מהפאנל, ובמרווח
+   גדול יותר שתי הטבעות נדבקות זו לזו. */
+.hero__lede::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: .5px solid var(--line-soft);
+  border-radius: calc(var(--r-card) - 4px);
+  pointer-events: none;
 }
 
 /* ============================================================
@@ -704,7 +724,6 @@ img, svg { max-width: 100%; }
    במונה. במצב בהיר הם נשארים --gold-deep.
    ============================================================ */
 [data-theme="dark"] .hero__verse .verse-em,
-[data-theme="dark"] .hero__lede .verse-em,
 [data-theme="dark"] .hero__source { color: var(--ctr-num); }
 
 [data-theme="dark"] .search__submit { background: var(--ctr-num); }
@@ -1988,12 +2007,14 @@ img, svg { max-width: 100%; }
   .hero__crown { width: 30px; height: 30px; margin-bottom: 12px; }
   .hero__verse { line-height: 1.7; max-width: 17ch; }
   .hero__source { margin-top: 10px; }
-  /* 34ch כדי שהמשפט לא יימתח על חמש שורות במסך של טלפון. */
+  /* בטלפון המסגרת נמתחת לרוחב המלא ומתיישרת עם תיבת השאלה שמתחתיה;
+     ב-34ch היא הייתה צרה ממנה, ושתי מסגרות ברוחב שונה נקראות כתקלה. */
   .hero__lede {
-    max-width: 34ch;
-    margin-top: 14px;
+    max-width: none;
+    margin-top: 16px;
+    padding: 14px 18px;
     font-size: 16px;
-    line-height: 1.7;
+    line-height: 1.65;
   }
   .search { margin-top: 16px; }
   .search__field { padding-inline: 16px; }

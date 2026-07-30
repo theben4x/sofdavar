@@ -108,7 +108,6 @@ def register_routes(app: Flask) -> None:
             "verse_source": app.config["VERSE_SOURCE"],
             "verse_emphasis": app.config["VERSE_EMPHASIS"],
             "home_lede": app.config["HOME_LEDE"],
-            "home_lede_emphasis": app.config["HOME_LEDE_EMPHASIS"],
             "nav_categories": db.list_categories(),
             "current_year": date.today().year,
             "current_path": request.path,
