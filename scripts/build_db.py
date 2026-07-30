@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from app import db as dbmod  # noqa: E402
 from app.config import RESERVED_SLUGS  # noqa: E402
+from app.codes import derive_code, is_code  # noqa: E402
 from app.hebrew import index_text, slugify, unique_slug  # noqa: E402
 
 SEED = ROOT / "data" / "seed"
@@ -80,6 +81,9 @@ def main() -> int:
     # ---- שאלות -------------------------------------------------------------
     questions = load("questions.json", [])
     inserted = 0
+    # קודי הכתובת חייבים להיות ייחודיים על פני כל המאגר, לא רק בקטגוריה.
+    codes: set[str] = set()
+    missing_codes: list[str] = []
     for group in questions:
         slug = group["category"]
         category_id = category_ids.get(slug)
@@ -90,15 +94,23 @@ def main() -> int:
         taken: set[str] = set()
         for order, item in enumerate(group.get("questions", [])):
             question_slug = unique_slug(slugify(item["question"]), taken)
+            code = (item.get("code") or "").strip()
+            if not is_code(code) or code in codes:
+                # גיבוב הטקסט הוא רשת ביטחון בלבד: הוא יציב רק כל עוד
+                # השאלה לא נוסחה מחדש, וזו בדיוק הבעיה שהקוד פותר.
+                code = derive_code(f"{slug}/{item['question']}", codes)
+                missing_codes.append(item["question"][:40])
+            codes.add(code)
             conn.execute(
                 """
                 INSERT INTO questions (
-                    category_id, slug, number, question, short_answer, body,
+                    category_id, code, slug, number, question, short_answer, body,
                     sources, minhag_ashkenaz, minhag_sepharad, keywords, sort_order
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     category_id,
+                    code,
                     question_slug,
                     -(inserted + 1),  # זמני — renumber_questions קובע את הסופי
                     item["question"],
@@ -113,6 +125,10 @@ def main() -> int:
             )
             inserted += 1
     print(f"  · {inserted} שאלות")
+    if missing_codes:
+        print(f"  ! {len(missing_codes)} שאלות ללא code בקובץ ה-seed — נגזר קוד זמני מגיבוב הטקסט.")
+        print("    הריצו scripts/assign_codes.py ושמרו את התוצאה ב-git, אחרת הכתובת")
+        print("    שלהן תשתנה בפעם הבאה שהשאלה תנוסח מחדש.")
 
     # ---- מה נברך -----------------------------------------------------------
     foods = load("berachot.json", [])

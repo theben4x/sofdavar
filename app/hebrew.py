@@ -114,10 +114,11 @@ def fts_query(raw: str, *, prefix: bool = True) -> str:
 
 
 def slugify(text: str, *, max_words: int = 8, max_chars: int = 70) -> str:
-    """slug עברי קריא ל-URL.
+    """slug עברי קריא.
 
-    כתובות בעברית טובות ל-SEO בעברית וגוגל מציג אותן מפוענחות. מה שחשוב
-    הוא שה-slug יהיה יציב ובלי תווים שדורשים בריחה נוספת בנתיב.
+    מאז שכתובת השאלה היא ``/q/<code>``, ה-slug אינו הכתובת אלא רק המפתח
+    שמאפשר לכתובות הישנות להמשיך להפנות פנימה. הוא נשמר במסד ואינו מוצג
+    לגולש. ראה ``app/codes.py``.
     """
     text = strip_niqqud(text or "")
     text = _HEB_PUNCT_RE.sub(" ", text)

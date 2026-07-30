@@ -37,6 +37,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from app import db as dbmod  # noqa: E402
+from app.codes import random_code  # noqa: E402
 from app.config import RESERVED_SLUGS  # noqa: E402
 from app.hebrew import slugify, unique_slug  # noqa: E402
 
@@ -205,6 +206,11 @@ def main() -> int:
             categories[name] = cursor.lastrowid
             next_order += 1
 
+    # קוד הכתובת ייחודי על פני כל המאגר. הייבוא מגריל קוד חדש לכל שאלה,
+    # ומכאן הוא נשמר במסד ולא משתנה עוד. מקור האמת לטווח ארוך הוא
+    # data/seed/questions.json — ראה scripts/assign_codes.py.
+    codes = {row["code"] for row in conn.execute("SELECT code FROM questions")}
+
     # ה-slug חייב להיות ייחודי בתוך הקטגוריה, כולל מול מה שכבר במאגר.
     taken: dict[int, set[str]] = {}
     for row in conn.execute("SELECT category_id, slug FROM questions"):
@@ -223,18 +229,20 @@ def main() -> int:
         if category_id is None:
             continue
         slug = unique_slug(slugify(row["question"]), taken.setdefault(category_id, set()))
+        code = random_code(codes)
+        codes.add(code)
         order = next_order_in.get(category_id, 0)
         next_order_in[category_id] = order + 1
 
         conn.execute(
             """
             INSERT INTO questions (
-                category_id, slug, number, question, short_answer, body,
+                category_id, code, slug, number, question, short_answer, body,
                 sources, minhag_ashkenaz, minhag_sepharad, keywords, sort_order
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                category_id, slug, -(imported + 1_000_000),
+                category_id, code, slug, -(imported + 1_000_000),
                 row["question"], row["short_answer"],
                 json.dumps(row["body"], ensure_ascii=False),
                 json.dumps(row["sources"], ensure_ascii=False),

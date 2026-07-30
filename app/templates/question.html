@@ -155,7 +155,7 @@
     <h2 class="section__title section__title--sub" style="margin-top:26px">שאלות קשורות</h2>
     <div class="qa-list">
       {% for item in related %}
-        {{ qa_accordion_item(item, item.category_slug | default(question.category_slug)) }}
+        {{ qa_accordion_item(item) }}
       {% endfor %}
     </div>
   </div>
@@ -170,7 +170,7 @@
     <nav class="qa-nav" aria-label="ניווט בין שאלות">
       {% if neighbours.prev %}
       <a class="qa-nav__link qa-nav__link--prev"
-         href="/{{ neighbours.prev.category_slug }}/{{ neighbours.prev.slug }}"
+         href="/q/{{ neighbours.prev.code }}"
          rel="prev">
         <span class="qa-nav__dir">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -185,7 +185,7 @@
 
       {% if neighbours.next %}
       <a class="qa-nav__link qa-nav__link--next"
-         href="/{{ neighbours.next.category_slug }}/{{ neighbours.next.slug }}"
+         href="/q/{{ neighbours.next.code }}"
          rel="next">
         <span class="qa-nav__dir">
           שאלה הבאה

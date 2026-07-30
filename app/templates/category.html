@@ -32,7 +32,7 @@
     {% if questions %}
     <div class="qa-list">
       {% for question in questions %}
-        {{ qa_accordion_item(question, category.slug) }}
+        {{ qa_accordion_item(question) }}
       {% endfor %}
     </div>
 

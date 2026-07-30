@@ -35,6 +35,10 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS questions (
     id              INTEGER PRIMARY KEY,
     category_id     INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    -- הכתובת הקבועה של השאלה: /q/<code>. אינו נגזר מהטקסט ואינו משתנה
+    -- עם ניסוח מחדש או עם מיספור מחדש. ראה app/codes.py.
+    code            TEXT    NOT NULL UNIQUE,
+    -- ה-slug העברי נשאר רק כדי שכתובות ישנות ימשיכו להפנות פנימה.
     slug            TEXT    NOT NULL,
     -- המספור רציף על פני כל האתר ולא מתאפס בין קטגוריות.
     number          INTEGER NOT NULL UNIQUE,
@@ -177,6 +181,20 @@ def get_question(category_slug: str, question_slug: str) -> dict[str, Any] | Non
     return _row_to_question(row) if row else None
 
 
+def get_question_by_code(code: str) -> dict[str, Any] | None:
+    """השאילתה הראשית של עמוד השאלה — ``/q/<code>``."""
+    row = get_db().execute(
+        """
+        SELECT q.*, c.slug AS category_slug, c.name AS category_name, c.color AS category_color
+        FROM questions q
+        JOIN categories c ON c.id = q.category_id
+        WHERE q.code = ?
+        """,
+        (code,),
+    ).fetchone()
+    return _row_to_question(row) if row else None
+
+
 def get_question_by_number(number: int) -> dict[str, Any] | None:
     row = get_db().execute(
         """
@@ -197,7 +215,7 @@ def question_neighbours(number: int) -> dict[str, dict[str, Any] | None]:
     """
     db = get_db()
     fields = """
-        q.number, q.slug, q.question,
+        q.number, q.code, q.question,
         c.slug AS category_slug, c.name AS category_name
     """
     prev_row = db.execute(
@@ -280,10 +298,10 @@ def list_berachot() -> list[dict[str, Any]]:
 
 
 def all_question_refs() -> Iterable[sqlite3.Row]:
-    """לשימוש ה-sitemap: כל צמדי (קטגוריה, שאלה)."""
+    """לשימוש ה-sitemap: הקוד של כל שאלה."""
     return get_db().execute(
         """
-        SELECT c.slug AS category_slug, q.slug AS question_slug
+        SELECT q.code
         FROM questions q JOIN categories c ON c.id = q.category_id
         ORDER BY q.number
         """
@@ -423,7 +441,7 @@ def _hydrate(scored: list[tuple[float, str, int]]) -> list[dict[str, Any]]:
                 "title": row["question"],
                 "subtitle": row["category_name"],
                 "number": row["number"],
-                "url": f"/{row['category_slug']}/{row['slug']}",
+                "url": f"/q/{row['code']}",
             })
     return results
 

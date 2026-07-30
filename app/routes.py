@@ -17,7 +17,7 @@ from flask import (
 )
 from markupsafe import Markup, escape
 
-from . import blog, db, parasha, zmanim
+from . import blog, codes, db, parasha, zmanim
 from .config import rounded_floor
 from .hebrew import normalize
 
@@ -227,18 +227,15 @@ def register_routes(app: Flask) -> None:
 
     @app.route("/q/<int:number>")
     def question_by_number(number: int):
-        """קיצור לציטוט: /q/47 מפנה לכתובת הקנונית של שאלה 47."""
+        """קיצור היסטורי לציטוט: /q/47 מפנה לכתובת הקבועה של שאלה 47.
+
+        המספר הרץ ממוספר מחדש בכל ייבוא, ולכן הוא לא יכול להיות הכתובת
+        עצמה — אבל קישורים ישנים בנוסח הזה חייבים להמשיך לעבוד.
+        """
         question = db.get_question_by_number(number)
         if not question:
             abort(404)
-        return redirect(
-            url_for(
-                "question",
-                category_slug=question["category_slug"],
-                question_slug=question["slug"],
-            ),
-            code=301,
-        )
+        return redirect(url_for("question", code=question["code"]), code=301)
 
     # -----------------------------------------------------------------------
     # זמנים
@@ -358,7 +355,7 @@ def register_routes(app: Flask) -> None:
         urls += [(f"/blog/{p.slug}", "yearly") for p in blog.all_posts(app.config["BLOG_DIR"])]
         urls += [(f"/{c['slug']}", "weekly") for c in db.list_categories()]
         urls += [
-            (f"/{r['category_slug']}/{r['question_slug']}", "monthly")
+            (f"/q/{r['code']}", "monthly")
             for r in db.all_question_refs()
         ]
 
@@ -402,12 +399,25 @@ def register_routes(app: Flask) -> None:
             questions=questions,
         )
 
-    @app.route("/<category_slug>/<question_slug>")
-    def question(category_slug: str, question_slug: str):
-        data = db.get_question(category_slug, question_slug)
+    @app.route("/q/<code>")
+    @app.route("/q/<code>/<path:decoration>")
+    def question(code: str, decoration: str | None = None):
+        """עמוד השאלה. הכתובת הקבועה היא ``/q/<code>`` ותו לא.
+
+        הסיומת הדקורטיבית מתקבלת כדי שאפשר יהיה לפרסם קישור קריא
+        (``/q/k7m2/מוקצה``), אבל היא לא חלק מהזהות: היא מופנית מיד אל
+        הכתובת הנקייה, וכך קיים לעמוד canonical אחד בלבד.
+        """
+        if not codes.is_code(code):
+            abort(404)
+        data = db.get_question_by_code(code)
         if not data:
             abort(404)
-        path = f"/{category_slug}/{question_slug}"
+        if decoration is not None:
+            return redirect(url_for("question", code=code), code=301)
+
+        category_slug = data["category_slug"]
+        path = f"/q/{code}"
 
         # FAQPage — התשובה שנמסרת למנוע החיפוש היא התשובה הישירה יחד עם
         # ההרחבה, בדיוק מה שמופיע בעמוד. אין כאן תוכן שהמשתמש לא רואה.
@@ -443,6 +453,19 @@ def register_routes(app: Flask) -> None:
             related=db.related_questions(data),
             neighbours=db.question_neighbours(data["number"]),
         )
+
+    @app.route("/<category_slug>/<question_slug>")
+    def legacy_question(category_slug: str, question_slug: str):
+        """הכתובת הישנה — ``/shabbat/<slug עברי>``.
+
+        חייבת להישאר: היא זו שנשמרה במועדפים, שותפה בוואטסאפ ונאספה
+        לגוגל. 301 קבוע, ולכן מנועי החיפוש מעבירים את הדירוג לכתובת
+        החדשה במקום להחזיק שתי כתובות לאותו תוכן.
+        """
+        data = db.get_question(category_slug, question_slug)
+        if not data:
+            abort(404)
+        return redirect(url_for("question", code=data["code"]), code=301)
 
     # -----------------------------------------------------------------------
     # שגיאות

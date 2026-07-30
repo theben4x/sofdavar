@@ -107,7 +107,8 @@
 
 
 {# פריט אקורדיון בעמוד הקטגוריה. התשובה המלאה נמצאת רק בעמוד השאלה. #}
-{% macro qa_accordion_item(question, category_slug) %}
+{# הקישור הוא /q/<code> ותו לא — הקטגוריה כבר לא חלק מכתובת השאלה. #}
+{% macro qa_accordion_item(question) %}
 <details class="qa-item">
   <summary class="qa-item__summary">
     <span class="qa-item__number"><span class="qa-item__number-word">שאלה </span>{{ question.number }}</span>
@@ -121,7 +122,7 @@
     <p style="font-family:var(--font-serif);font-size:17px;font-weight:700;line-height:1.5">
       {{ question.short_answer }}
     </p>
-    <a class="button button--gold" href="/{{ category_slug }}/{{ question.slug }}">
+    <a class="button button--gold" href="/q/{{ question.code }}">
       לתשובה המלאה ולמקורות
       <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
