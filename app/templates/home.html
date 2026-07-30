@@ -16,25 +16,9 @@
     <h1 class="hero__verse">{{ verse | emphasize(verse_emphasis) }}</h1>
     <p class="hero__source">{{ verse_source }}</p>
 
+    {# המונה המונפש שהיה כאן עבר אל תוך תיבת השאלה עצמה: אפקט ההקלדה של
+       "למעלה מ-20,000 שאלות ותשובות" הוא הרמז שבשדה. ראה .search__hint. #}
     {{ search_box() }}
-
-    {# המונה המונפש. הטקסט מופיע פעמיים בכוונה: העותק הנסתר (ghost) מחזיק
-       את רוחב הקפסולה מראש, אחרת היא מתנפחת תו אחר תו והמעוינים נדחפים
-       החוצה. שניהם חייבים להישאר זהים. #}
-    <div class="counter" id="counter">
-      <span class="counter__rule"></span>
-      <span class="counter__dot"></span>
-
-      <span class="counter__pill">
-        <span class="counter__line counter__ghost" aria-hidden="true">למעלה מ־<span class="counter__num">{{ display_total | thousands }}</span>שאלות ותשובות</span>
-        <span class="counter__typer">
-          <span class="counter__line">למעלה מ־<span class="counter__num">{{ display_total | thousands }}</span>שאלות ותשובות</span>
-        </span>
-      </span>
-
-      <span class="counter__dot counter__dot--b"></span>
-      <span class="counter__rule"></span>
-    </div>
   </div>
 </section>
 
@@ -44,7 +28,7 @@
     {{ category_grid(categories=categories) }}
     <p style="text-align:center;margin-top:18px">
       <a class="section__link" href="{{ url_for('search_page') }}">
-        חיפוש מתקדם <span class="arrow-glyph" aria-hidden="true">←</span>
+        שאלו אותי <span class="arrow-glyph" aria-hidden="true">←</span>
       </a>
     </p>
   </div>

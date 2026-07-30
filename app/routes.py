@@ -80,6 +80,15 @@ def register_routes(app: Flask) -> None:
             "strip_shabbat": shabbat,
         }
 
+    @app.template_global()
+    def display_total() -> int:
+        """המספר שמוצג כ"למעלה מ-N" ברמז שבתוך תיבת השאלה.
+
+        template_global ולא משתנה הקשר: הרמז מרונדר בתוך ``search_box``,
+        ומאקרו מיובא אינו רואה את ההקשר של העמוד שקורא לו.
+        """
+        return app.config["DISPLAY_TOTAL_OVERRIDE"] or rounded_floor(db.question_count())
+
     @app.template_filter("thousands")
     def thousands(value: int) -> str:
         return f"{value:,}"
@@ -129,7 +138,6 @@ def register_routes(app: Flask) -> None:
             ),
             categories=db.list_categories(),
             total_questions=total,
-            display_total=app.config["DISPLAY_TOTAL_OVERRIDE"] or rounded_floor(total),
             question_of_day=db.question_of_the_day(date.today()),
             shabbat=zmanim.upcoming_shabbat(zmanim.DEFAULT_CITY),
         )
@@ -169,9 +177,9 @@ def register_routes(app: Flask) -> None:
         return render_template(
             "search.html",
             meta=_meta(
-                f'חיפוש: {query}' if query else "חיפוש",
+                f'שאלו אותי: {query}' if query else "שאלו אותי",
                 f'תוצאות חיפוש עבור "{query}" במאגר סוף דבר.' if query
-                else "חיפוש במאגר השאלות והתשובות.",
+                else "שאלו אותי — חיפוש במאגר השאלות והתשובות.",
                 "/search",
                 noindex=True,  # עמודי תוצאות אינם תוכן ייחודי
             ),

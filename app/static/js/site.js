@@ -88,55 +88,6 @@
     }
   }
 
-  /* ------------------------------------------------- מונה השאלות המונפש */
-
-  var counter = document.getElementById('counter');
-  if (counter) {
-    var ghost = counter.querySelector('.counter__ghost');
-    var typer = counter.querySelector('.counter__typer');
-
-    /* מדידת רוחב הטקסט — offsetWidth ולא getBoundingClientRect.
-       ה-rect הוא המלבן *החזותי*, ולכן הוא מוכפל ב-transform של ההורה:
-       .counter__pill רץ ctrPop מ-scale(.92) ל-scale(1). כל resize שנפל בתוך
-       חצי השנייה הזאת מדד 262.67*0.92=241.66 וכתב --tw:245px במקום 266px.
-       ctrType נגמר ב-forwards, ולכן הרוחב הפגום ננעל, ו-overflow:hidden
-       בלע 17.7px — הזנב של "ותשובות". offsetWidth הוא מידת פריסה, שקופה
-       ל-transform, וגם כבר מעגלת כלפי מעלה (262.67 -> 263). */
-    var measure = function () {
-      typer.style.setProperty('--tw', ghost.offsetWidth + 3 + 'px');
-    };
-
-    var startCounter = function () {
-      measure();
-      var io = new IntersectionObserver(function (entries) {
-        if (!entries[0].isIntersecting) return;
-        io.disconnect();                 /* פעם אחת בלבד */
-        counter.classList.add('is-visible');
-      }, { threshold: 0.6 });
-      io.observe(counter);
-    };
-
-    /* חובה לחכות לפונטים — מדידה לפני שהם נטענים מודדת את פונט ברירת המחדל,
-       והסמן חונה 28px אחרי סוף הטקסט. אבל בלי תקרת זמן הקפסולה תקועה על
-       opacity:0 כל עוד fonts.googleapis.com לא ענה — ואם הוא חסום, לתמיד. */
-    if (document.fonts && document.fonts.ready) {
-      Promise.race([
-        document.fonts.ready,
-        new Promise(function (resolve) { setTimeout(resolve, 1500); })
-      ]).then(startCounter);
-
-      /* הגיעו אחרי שכבר מדדנו? למדוד שוב. ctrType קורא את var(--tw) מחדש,
-         ולכן הרוחב מתעדכן גם באמצע האנימציה וגם אחריה. */
-      if (document.fonts.addEventListener) {
-        document.fonts.addEventListener('loadingdone', measure);
-      }
-    } else {
-      startCounter();
-    }
-
-    window.addEventListener('resize', measure);
-  }
-
   /* ------------------------------------------------------------ תפריט בנייד */
 
   var navToggle = document.getElementById('nav-toggle');
@@ -414,15 +365,73 @@
 
     if (input.value.trim()) form.classList.add('search--filled');
 
-    // הדוגמאות ב-placeholder נחתכות במסך צר, ועדיף רמז קצר ושלם
-    // על פני רמז ארוך שנגמר באמצע מילה.
-    var narrow = window.matchMedia('(max-width: 560px)');
-    var full = input.placeholder;
-    function fitPlaceholder() {
-      input.placeholder = narrow.matches ? 'חפשו נושא או שאלה' : full;
+    /* ------------------------------------------------ רמז ההקלדה שבשדה */
+
+    var hint = document.getElementById('search-hint');
+    if (hint) {
+      var hintLine = hint.querySelector('.search__hint-line');
+      var started = false;
+      var focused = false;
+
+      /* offsetWidth ולא getBoundingClientRect: ה-rect הוא המלבן *החזותי*
+         ולכן הוא מוכפל בכל transform של הורה — והשכבה עצמה יושבת על
+         translateY(-50%). offsetWidth הוא מידת פריסה, שקופה ל-transform,
+         וגם כבר מעגלת כלפי מעלה. 3px נוספים הם רוחב הסמן. */
+      var measureHint = function () {
+        hint.style.setProperty('--tw', hintLine.offsetWidth + 3 + 'px');
+      };
+
+      var startHint = function () {
+        measureHint();
+        // רק כאן מוחקים את ה-placeholder. עד לרגע הזה הוא הרמז היחיד,
+        // ומחיקה מוקדמת הייתה משאירה שדה ריק עד שהפונטים נטענים.
+        input.placeholder = '';
+        form.classList.add('search--hinting');
+        if (focused) form.classList.add('search--hinted');
+        started = true;
+      };
+
+      // פוקוס באמצע ההקלדה: שני סמנים מהבהבים באותו שדה קוראים כתקלה.
+      // הדגל נשמר גם אם הפוקוס הגיע לפני ההתחלה (autofocus ב-/search).
+      input.addEventListener('focus', function () {
+        focused = true;
+        if (started) form.classList.add('search--hinted');
+      });
+
+      // מחכים לגלילה אל השדה — בעמוד הקטגוריה הוא באמצע העמוד, ואנימציה
+      // שרצה מחוץ למסך פשוט הולכת לאיבוד.
+      var observeHint = function () {
+        measureHint();
+        if (!window.IntersectionObserver) { startHint(); return; }
+        var io = new IntersectionObserver(function (entries) {
+          if (!entries[0].isIntersecting) return;
+          io.disconnect();                 // פעם אחת בלבד
+          startHint();
+        }, { threshold: 0.6 });
+        io.observe(form);
+      };
+
+      /* חובה לחכות לפונטים — מדידה לפני שהם נטענים מודדת את פונט ברירת
+         המחדל, והסמן חונה אחרי סוף הטקסט. בלי תקרת זמן הרמז היה תלוי
+         ב-fonts.googleapis.com, ואם הוא חסום — לתמיד. */
+      if (document.fonts && document.fonts.ready) {
+        Promise.race([
+          document.fonts.ready,
+          new Promise(function (resolve) { setTimeout(resolve, 1500); })
+        ]).then(observeHint);
+
+        // הגיעו אחרי שכבר מדדנו? למדוד שוב. hintType קורא את var(--tw)
+        // מחדש, ולכן הרוחב מתעדכן גם באמצע האנימציה וגם אחריה.
+        if (document.fonts.addEventListener) {
+          document.fonts.addEventListener('loadingdone', measureHint);
+        }
+      } else {
+        observeHint();
+      }
+
+      // הזנב ("ותשובות") יורד במסך צר, ולכן הרוחב הסופי משתנה עם המידה.
+      window.addEventListener('resize', measureHint);
     }
-    fitPlaceholder();
-    narrow.addEventListener('change', fitPlaceholder);
   }
 
   /* ------------------------------------------------------- מסנן טבלת הברכות */

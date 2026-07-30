@@ -44,26 +44,43 @@
 {% endmacro %}
 
 
-{# תיבת החיפוש. תבנית combobox: הקלט שולט ברשימה, והרשימה עצמה listbox. #}
+{# תיבת השאלה. תבנית combobox: הקלט שולט ברשימה, והרשימה עצמה listbox.
+
+   הרמז שבתוך השדה מופיע פעמיים בכוונה: פעם אחת כ-placeholder אמיתי, שהוא
+   מה שנראה כשאין JavaScript, ופעם שנייה כשכבת ההקלדה שמעליו. site.js מוחק
+   את ה-placeholder ברגע שהוא מתחיל להקליד — אחרת השניים היו נערמים.
+   ``display_total`` הוא template_global ולא משתנה הקשר: מאקרו מיובא אינו
+   רואה את ההקשר של העמוד שקורא לו. #}
 {% macro search_box(value='', autofocus=false) %}
+{% set total = display_total() | thousands %}
 <form class="search" id="search" role="search" action="{{ url_for('search_page') }}" method="get">
-  <label class="visually-hidden" for="search-input">חיפוש נושא או שאלה</label>
+  <label class="visually-hidden" for="search-input">שאלו אותי — הקלידו נושא או שאלה</label>
   <div class="search__field">
     <svg class="search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
          stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
       <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
     </svg>
-    <input class="search__input" id="search-input" name="q" type="search"
-           value="{{ value }}" placeholder="חפשו נושא או שאלה — למשל: מוקצה, ברכה על פיצה"
-           autocomplete="off" role="combobox" aria-expanded="false"
-           aria-controls="search-panel" aria-autocomplete="list"
-           {% if autofocus %}autofocus{% endif %}>
-    <button class="search__clear" type="button" id="search-clear" aria-label="נקה חיפוש">×</button>
+    {# העטיפה קיימת רק כדי לתת לשכבת ההקלדה מסגרת מיקום שזהה בדיוק לשדה. #}
+    <span class="search__entry">
+      <input class="search__input" id="search-input" name="q" type="search"
+             value="{{ value }}" placeholder="למעלה מ־{{ total }} שאלות ותשובות"
+             autocomplete="off" role="combobox" aria-expanded="false"
+             aria-controls="search-panel" aria-autocomplete="list"
+             {% if autofocus %}autofocus{% endif %}>
+      {% if not value %}
+      {# aria-hidden: זו כפילות של ה-placeholder, וקורא מסך כבר מקבל את
+         הטקסט מהתווית הנסתרת. #}
+      <span class="search__hint" id="search-hint" aria-hidden="true">
+        <span class="search__hint-line">למעלה מ־<b class="search__hint-num">{{ total }}</b><span class="search__hint-word">שאלות</span><span class="search__hint-tail"> ותשובות</span></span>
+      </span>
+      {% endif %}
+    </span>
+    <button class="search__clear" type="button" id="search-clear" aria-label="נקה">×</button>
     {# הטופס הוא GET רגיל ל-/search, ולכן הכפתור עובד גם בלי JS — בדיוק כמו Enter. #}
-    <button class="search__submit" type="submit">חיפוש</button>
+    <button class="search__submit" type="submit">שאלו אותי</button>
   </div>
   <ul class="search__panel" id="search-panel" role="listbox"
-      aria-label="הצעות חיפוש" hidden></ul>
+      aria-label="הצעות" hidden></ul>
   <p class="visually-hidden" id="search-status" role="status" aria-live="polite"></p>
 </form>
 {% endmacro %}

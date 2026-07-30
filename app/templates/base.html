@@ -92,11 +92,11 @@
   {# הפקדים עטופים יחד כדי שהסרגל יהיה שלושה תאים — לוגו | ניווט | פקדים —
      ורק כך הניווט ממורכז במרכז העמוד ולא במרכז מה שנשאר בין השניים. #}
   <div class="topbar__actions">
-    {# חיפוש זמין מכל עמוד, ליד מתג הבהיר/כהה. קישור-אייקון ולא תיבת חיפוש
+    {# החיפוש זמין מכל עמוד, ליד מתג הבהיר/כהה. קישור-אייקון ולא תיבת חיפוש
        שנייה, וכ-<a> רגיל הוא עובד גם בלי JS.
        היה כאן תנאי שהסתיר אותו ב-/ ו-/search; הוסר כדי שמקומו בסרגל יהיה
        קבוע — אייקון שמופיע ונעלם בין עמודים מאלץ חיפוש מחדש בכל ניווט. #}
-    <a class="icon-button" href="{{ url_for('search_page') }}" aria-label="חיפוש במאגר"
+    <a class="icon-button" href="{{ url_for('search_page') }}" aria-label="שאלו אותי"
        {% if current_path == '/search' %}aria-current="page"{% endif %}>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
            stroke-linecap="round" aria-hidden="true">

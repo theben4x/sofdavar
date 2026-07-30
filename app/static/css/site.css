@@ -76,10 +76,7 @@
   --ink-soft:   #7E7561;   /* כהה מהמקור (#9B917C) כדי לעבור AA על --panel */
   --shimmer:    rgba(184, 145, 46, .16);
 
-  /* ---- מונה השאלות המונפש (counter-pkg/counter-animated.html) ---- */
-  --ctr-fill:   #F0E9D8;
-  --ctr-border: #C9A227;
-  --ctr-text:   #3E3629;
+  /* ---- מונה השאלות: הזהב של המספר ושל סמן ההקלדה שברמז ---- */
   --ctr-num:    #7A5C15;
   --ctr-caret:  #8A6A18;
 }
@@ -127,10 +124,7 @@
   --ink-soft:   #A69D88;
   --shimmer:    rgba(201, 162, 39, .20);
 
-  /* ---- מונה השאלות המונפש, מצב כהה ---- */
-  --ctr-fill:   #221E15;
-  --ctr-border: #C9A227;
-  --ctr-text:   #E8E1D0;
+  /* ---- מונה השאלות, מצב כהה ---- */
   --ctr-num:    #D6B448;
   --ctr-caret:  #D6B448;
 }
@@ -499,104 +493,6 @@ img, svg { max-width: 100%; }
 }
 
 /* ============================================================
-   מונה השאלות המונפש  (מ-counter-pkg/counter-animated.html)
-   כוריאוגרפיה: קפסולה נכנסת → מעוינים נדלקים → הטקסט נכתב בפנים →
-   הסמן נעלם → קווי הזהב נמתחים החוצה. הרצף הוא מה שהופך את זה למכוון —
-   אל תריץ הכל במקביל.
-   ============================================================ */
-/* 24px ולא 38px: המונה יושב *מתחת* לתיבת החיפוש, ו-38px היו מנתקים
-   אותו ממנה. 38px היו המרווח מהפסוק, כשהוא עוד ישב מעליה. */
-.counter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 13px;
-  margin-top: 24px;
-}
-
-.counter__rule { height: .5px; background: var(--ctr-border); width: 0; }
-
-.counter__dot {
-  width: 6px;
-  height: 6px;
-  background: var(--ctr-border);
-  transform: rotate(45deg);
-  flex: none;
-  opacity: 0;
-}
-
-.counter__pill {
-  position: relative;
-  display: inline-block;
-  border: 1px solid var(--ctr-border);
-  border-radius: 999px;
-  background: var(--ctr-fill);
-  padding: 13px 31px;
-  opacity: 0;
-}
-
-.counter__line {
-  font-family: var(--font-sans);
-  white-space: nowrap;
-  font-size: 17px;
-  font-weight: 500;          /* 500 ולא 600 — בעברית משקל גבוה סותם את האותיות */
-  color: var(--ctr-text);
-  line-height: 1.5;
-}
-
-.counter__num {
-  font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 22px;           /* ספרות סריף נראות קטנות יותר מסאנס באותו גודל */
-  color: var(--ctr-num);
-  font-feature-settings: "tnum";   /* חובה — בלי זה השורה קופצת */
-  margin: 0 6px;
-}
-
-/* עותק נסתר שמחזיק את רוחב הקפסולה מראש.
-   בלעדיו הקפסולה מתנפחת תו אחר תו והמעוינים נדחפים החוצה. */
-.counter__ghost { visibility: hidden; display: inline-block; }
-
-/* הטקסט המונפש יושב מעל העותק הנסתר. ב-RTL הוא נחשף מימין לשמאל, ולכן
-   ה-border-inline-start משמש כסמן ההקלדה ונע לבד עם הקצה. */
-.counter__typer {
-  position: absolute;
-  top: 13px;
-  inset-inline-end: 31px;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 0;
-  border-inline-start: 1.5px solid transparent;
-}
-
-/* האנימציה רצה רק כשנוספת המחלקה is-visible */
-.counter.is-visible .counter__pill   { animation: ctrPop .5s cubic-bezier(.2,.8,.3,1) forwards; }
-.counter.is-visible .counter__dot    { animation: ctrDot .4s ease-out .2s forwards; }
-.counter.is-visible .counter__dot--b { animation-delay: .3s; }
-.counter.is-visible .counter__typer  { animation: ctrType 1.5s steps(27) .5s forwards,
-                                                  ctrBlink .8s step-end .5s 2,
-                                                  ctrHide .01s 2.1s forwards; }
-.counter.is-visible .counter__rule   { animation: ctrGrow .8s cubic-bezier(.2,.8,.3,1) 2.15s forwards; }
-
-@keyframes ctrPop   { from { opacity: 0; transform: scale(.92) } to { opacity: 1; transform: scale(1) } }
-@keyframes ctrType  { from { width: 0 } to { width: var(--tw) } }   /* --tw נמדד ב-JS */
-@keyframes ctrGrow  { from { width: 0 } to { width: 74px } }
-@keyframes ctrBlink { 0%, 100% { border-inline-start-color: var(--ctr-caret) } 50% { border-inline-start-color: transparent } }
-@keyframes ctrHide  { to { border-inline-start-color: transparent } }
-@keyframes ctrDot   { from { opacity: 0; transform: rotate(45deg) scale(.4) }
-                      to   { opacity: 1; transform: rotate(45deg) scale(1) } }
-
-/* נגישות: מצב סופי מיד, בלי תנועה. בלי זה הקפסולה נשארת ב-opacity:0
-   למי שכיבה אנימציות. */
-@media (prefers-reduced-motion: reduce) {
-  .counter__pill  { opacity: 1; animation: none !important; }
-  .counter__dot   { opacity: 1; animation: none !important; }
-  .counter__rule  { width: 74px; animation: none !important; }
-  .counter__ghost { visibility: visible; }
-  .counter__typer { display: none; }
-}
-
-/* ============================================================
    חיפוש — תבנית combobox נגישה
    ============================================================ */
 .search {
@@ -624,6 +520,15 @@ img, svg { max-width: 100%; }
 
 .search__icon { width: 20px; height: 20px; flex: none; color: var(--ink-muted); }
 
+/* מסגרת המיקום של שכבת ההקלדה. חייבת לעטוף את הקלט *בלבד*, אחרת הרמז
+   מתחיל בקצה הגלולה ולא בנקודה שבה מתחיל הטקסט שמקלידים. */
+.search__entry {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
 .search__input {
   flex: 1;
   min-width: 0;
@@ -636,6 +541,108 @@ img, svg { max-width: 100%; }
 }
 .search__input::placeholder { color: var(--ink-muted); }
 .search__input:focus { outline: none; }
+
+/* ------------------------------------------------------------
+   רמז ההקלדה שבתוך השדה  (היה המונה המונפש שמתחת לתיבה)
+   ה-placeholder האמיתי נשאר ב-HTML בשביל מצב בלי JavaScript; site.js
+   מוחק אותו בדיוק כשהוא מתחיל להקליד, כדי שהשניים לא ייערמו.
+
+   inset-inline-start ולא end: ב-RTL זה הקצה הימני, ושם מתחיל הטקסט.
+   הקצה הזה מוצמד, החלון גדל שמאלה, וכך מה שכבר נכתב לא זז — בלעדיו כל
+   השורה הייתה מחליקה הצידה בכל צעד. ה-border-inline-end (הקצה השמאלי
+   ב-RTL) הוא הקצה המוביל, ולכן הוא משמש כסמן ההקלדה בלי אלמנט נוסף.
+   ------------------------------------------------------------ */
+.search__hint {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  /* חובה: השכבה ממוקמת אבסולוטית ולכן היא חורגת מהעטיפה בלי להיחתך,
+     ורמז רחב ממסך צר היה נכתב מעל כפתור "שאלו אותי". */
+  max-width: 100%;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  border-inline-end: 1.5px solid transparent;
+  --hint-steps: 27;
+}
+
+.search__hint-line {
+  display: inline-block;
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+
+.search__hint-num {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 20px;           /* ספרות סריף נראות קטנות יותר מסאנס באותו גודל */
+  color: var(--ctr-num);
+  font-feature-settings: "tnum";   /* חובה — בלי זה השורה קופצת */
+  margin: 0 5px;
+}
+
+/* --tw נמדד ב-JS. האנימציה רצה רק כשנוספת המחלקה על הטופס. */
+.search--hinting .search__hint {
+  animation: hintType 1.5s steps(var(--hint-steps, 27)) forwards,
+             hintBlink .8s step-end 2,
+             hintHide .01s 1.65s forwards;
+}
+
+/* פוקוס באמצע ההקלדה: שני סמנים מהבהבים באותו שדה קוראים כתקלה.
+   קופצים לסוף — הרמז נשאר, האנימציה נעצרת. */
+.search--hinted .search__hint {
+  animation: none !important;
+  width: var(--tw, auto);
+  border-inline-end-color: transparent;
+}
+
+/* ברגע שיש טקסט, הרמז נעלם — בדיוק כמו placeholder. */
+.search--filled .search__hint { display: none; }
+
+@keyframes hintType  { from { width: 0 } to { width: var(--tw) } }
+@keyframes hintBlink { 0%, 100% { border-inline-end-color: var(--ctr-caret) } 50% { border-inline-end-color: transparent } }
+@keyframes hintHide  { to { border-inline-end-color: transparent } }
+
+/* נגישות: הרמז המלא מיד, בלי תנועה. בלי זה הוא נשאר ב-width:0 למי
+   שכיבה אנימציות — כלומר שדה בלי שום רמז, כי ה-placeholder כבר נמחק.
+   תלוי ב---hinting דווקא: היא נוספת באותו רגע שבו ה-placeholder נמחק,
+   ובלי התלות הרמז היה מוצג מעליו עד שה-JS מגיע. */
+@media (prefers-reduced-motion: reduce) {
+  .search--hinting .search__hint {
+    width: auto;
+    animation: none !important;
+    border-inline-end-color: transparent;
+  }
+}
+
+/* השטח שנשאר לרמז הוא רוחב המסך פחות ~212px קבועים (שוליים, ריפוד,
+   אייקון, מרווחים, וכפתור "שאלו אותי" שהוא 104px). הרמז המלא הוא 219px
+   ב-15px, "שאלות" לבדה 164px, והמספר לבדו 120px — ומכאן שתי המידות:
+   ב-460px נגמר המקום לזנב, וב-400px גם ל"שאלות".
+   רמז קצר ושלם עדיף על ארוך שנגמר באמצע מילה. מספר הצעדים יורד יחד עם
+   הטקסט, אחרת כל צעד "מקליד" חצי אות. */
+@media (max-width: 460px) {
+  .search__hint { --hint-steps: 19; }
+  .search__hint-tail { display: none; }
+}
+
+/* בטלפון של 360-390px, 32px של אייקון ומרווח הם ההבדל בין "20,000 שאלות"
+   לרמז שנגמר באמצע המספר. האייקון הוא הקישוט הוותר ביותר בשדה: הכפתור
+   "שאלו אותי" והרמז עצמו כבר אומרים מה הוא עושה. */
+@media (max-width: 400px) {
+  .search__icon { display: none; }
+}
+
+/* 320px — גם "שאלות" כבר לא נכנסת. נשאר המספר, שהוא עיקר המסר. */
+@media (max-width: 340px) {
+  .search__hint { --hint-steps: 14; }
+  .search__hint-word { display: none; }
+}
 
 .search__clear {
   display: none;
@@ -1874,17 +1881,12 @@ img, svg { max-width: 100%; }
   .hero__crown { width: 30px; height: 30px; margin-bottom: 12px; }
   .hero__verse { line-height: 1.7; max-width: 17ch; }
   .hero__source { margin-top: 10px; }
-  /* בטלפון הקווים הנמתחים (74px כל אחד) גוזלים 148px מרוחב שכבר צר,
-     והקפסולה נדחסת. מורידים אותם ומקטינים את הריפוד. */
-  .counter { margin-top: 18px; gap: 9px; }
-  .counter__rule { display: none; }
-  .counter__pill { padding: 10px 20px; }
-  .counter__typer { top: 10px; inset-inline-end: 20px; }
-  .counter__line { font-size: 15px; }
-  .counter__num { font-size: 19px; }
   .search { margin-top: 16px; }
   .search__field { padding-inline: 16px; }
   .search__input { padding-block: 14px; }
+  /* השדה מתקצר, ואיתו הרמז — אחרת סופו נחתך בשפת כפתור "שאלו אותי". */
+  .search__hint-line { font-size: 15px; }
+  .search__hint-num { font-size: 17px; margin: 0 4px; }
 
   /* המקטעים כבר מופרדים בעיטור זהב — 36px למעלה ולמטה הם מפריד כפול. */
   .section { padding: 26px 0; }
