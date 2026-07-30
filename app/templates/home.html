@@ -58,7 +58,7 @@
 
 <section class="section">
   <div class="wrap">
-    <div class="grid-cards">
+    <div class="grid-cards grid-cards--feature">
       {# הכרטיס מחזיק עכשיו גם את פרשת השבוע ואת בחירת העיר — מה שהיה
          קודם ברצועה השחורה שמעל הפוטר, ובכפתור שמתחת.
          העוגן קיים כדי שהטופס יחזיר את הגולש אל הכרטיס ולא אל ראש העמוד. #}
@@ -130,7 +130,7 @@
           פני הים. הדלקת הנרות היא מנהג המקום. למעשה — כמנהג הקהילה.
         </p>
 
-        <p style="margin-top:16px">
+        <p class="card__cta">
           <a class="button button--gold"
              href="{{ url_for('zmanim_page', city=shabbat.city.slug) }}">
             לכל הזמנים
@@ -144,7 +144,7 @@
           טבלת ברכות למאות מאכלים ומשקאות — ברכה ראשונה, ברכה אחרונה, ונוסח הברכות
           המלא בניקוד.
         </p>
-        <p style="margin-top:16px">
+        <p class="card__cta">
           <a class="button button--gold" href="{{ url_for('berachot_page') }}">לטבלת הברכות</a>
         </p>
       </div>
@@ -155,7 +155,7 @@
           כל שאלה ממוספרת במספר רץ אחד לכל האתר, ולכל שאלה עמוד משלה עם תשובה
           ישירה, הרחבה, מקורות והבדלי מנהג בין אשכנז לספרד.
         </p>
-        <p style="margin-top:16px">
+        <p class="card__cta">
           <a class="button" href="{{ url_for('about') }}">אודות האתר</a>
         </p>
       </div>
