@@ -816,6 +816,19 @@ img, svg { max-width: 100%; }
 
 .search__empty { padding: 18px 14px; text-align: center; color: var(--ink-muted); font-size: 14.5px; }
 
+/* כותרת מדור ההצעות הקרובות. משתמשת ב---ink-muted, שנבדק ל-AA על
+   שני הרקעים; אין כאן צבע חדש. הקו העליון מפריד בין התוצאות
+   הלקסיקליות לסמנטיות, כדי שיהיה ברור שאלה שתי רשימות שונות. */
+.search__group {
+  padding: 12px 14px 6px;
+  margin-top: 4px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-muted);
+  font-family: var(--font-serif);
+  font-size: 13.5px;
+  letter-spacing: .01em;
+}
+
 /* בנייד הגובה נגזר מהשטח שנשאר מעל המקלדת ולא מגובה ה-layout viewport —
    בלי זה הרשימה כולה נופלת מתחת למקלדת ואף הצעה אינה נראית. */
 @media (max-width: 860px) {

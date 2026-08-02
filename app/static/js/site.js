@@ -257,12 +257,15 @@
       }
     }
 
-    function render(items, query) {
-      results = items;
+    function render(items, also, query) {
+      also = also || [];
+      // הניווט בחצים עובר על שתי הרשימות ברצף, ולכן המספור משותף
+      // ו-aria-activedescendant ממשיך לעבוד בלי שינוי.
+      results = items.concat(also);
       activeIndex = -1;
       panel.innerHTML = '';
 
-      if (!items.length) {
+      if (!results.length) {
         var empty = document.createElement('li');
         empty.className = 'search__empty';
         empty.textContent = 'לא נמצאו תוצאות';
@@ -272,7 +275,16 @@
         return;
       }
 
-      items.forEach(function (item, index) {
+      results.forEach(function (item, index) {
+        if (index === items.length && also.length) {
+          // כותרת המדור. role="presentation" כדי שהיא לא תיספר
+          // כאפשרות ברשימה — היא טקסט, לא יעד ניווט.
+          var head = document.createElement('li');
+          head.setAttribute('role', 'presentation');
+          head.className = 'search__group';
+          head.textContent = 'עוד מהמאגר';
+          panel.appendChild(head);
+        }
         var li = document.createElement('li');
         li.setAttribute('role', 'presentation');
 
@@ -317,7 +329,8 @@
         panel.appendChild(li);
       });
 
-      status.textContent = items.length + ' תוצאות עבור ' + query;
+      status.textContent = items.length + ' תוצאות עבור ' + query +
+        (also.length ? ', ועוד ' + also.length + ' מהמאגר' : '');
       setExpanded(true);
     }
 
@@ -331,7 +344,7 @@
         .then(function (response) { return response.ok ? response.json() : null; })
         .then(function (data) {
           if (!data || current !== sequence) return;
-          render(data.results || [], query);
+          render(data.results || [], data.also || [], query);
         })
         .catch(function () { /* בעיית רשת — הטופס עדיין נשלח ל-/search */ });
     }

@@ -36,25 +36,38 @@ scripts/        בנייה, ייבוא, אימות
 
 ### הוספת שאלות
 
+**פקודה אחת, תמיד:**
+
 ```bash
-python scripts/import_questions.py my-questions.csv --dry-run
-python scripts/import_questions.py my-questions.csv
+python scripts/update.py                    # אחרי עריכה ידנית של questions.json
+python scripts/update.py my-questions.csv   # אחרי הכנת קובץ חדש
+python scripts/update.py my-questions.csv --dry-run
 ```
 
-הקובץ יכול להיות CSV או JSON, עם כותרות בעברית או באנגלית. המבנה המלא מתועד
-בראש `scripts/import_questions.py`. הקידוד מזוהה אוטומטית, כולל cp1255 של Excel
-בעברית.
+היא מריצה ארבעה שלבים ברצף: ייבוא אל `data/seed/questions.json`, שיבוץ קוד
+קבוע לכל שאלה חדשה, חישוב ווקטורים לחדשות ולמה שהשתנה בלבד, ובנייה מחדש של
+המסד. הקובץ יכול להיות CSV או JSON, עם כותרות בעברית או באנגלית; המבנה מתועד
+בראש `scripts/import_questions.py`, והקידוד מזוהה אוטומטית כולל cp1255 של
+Excel בעברית.
 
-דגלים שימושיים:
+> ⚠ **אל תריצו `scripts/import_questions.py` ישירות.** הוא כותב **למסד בלבד**,
+> ואילו `scripts/build_db.py` מוחק את המסד ובונה אותו מחדש מקבצי ה-seed —
+> כלומר הבנייה הבאה תמחק את כל מה שיובא, בלי הודעה. `update.py` נכתב בדיוק
+> כדי לסגור את הפער הזה: הוא מייבא אל קובץ המקור, ומשם הכול נבנה.
+> `import_questions.py` נשאר ככלי פירוק ה-CSV ש-`update.py` משתמש בו.
 
-| דגל | מה הוא עושה |
-|---|---|
-| `--dry-run` | מנתח ומדווח בלי לכתוב |
-| `--replace` | מוחק את כל השאלות הקיימות לפני הייבוא |
-| `--create-categories` | יוצר קטגוריות חדשות במקום לדלג עליהן |
+קטגוריה שאינה מוכרת **מפילה את הבנייה** במקום להידלג בשקט. שאלה שממתינה
+לנושא נשמרת ב-`data/seed/questions_pending.json` ואינה נטענת.
 
-אחרי כל ייבוא, המספור הרץ נבנה מחדש ואינדקס החיפוש מתעדכן — אין צורך בשום
-פעולה נוספת.
+### מדידת החיפוש
+
+```bash
+python scripts/eval_retrieval.py                  # הכול
+python scripts/eval_retrieval.py --source owner   # רק שאילתות שנכתבו בידי אדם
+```
+
+משווה ארבע שיטות על `data/eval/queries.json` ומדפיס Recall@1, Recall@5, MRR,
+אחוז אפס-תוצאות והימנעות. הריצו אחרי כל הוספת תוכן כדי לראות אם המספרים זזו.
 
 ### הוספת פוסט לבלוג
 

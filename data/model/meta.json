@@ -1,0 +1,7 @@
+{
+  "source_model": "minishlab/potion-multilingual-128M",
+  "dim": 256,
+  "vocab_source": 500353,
+  "vocab_kept": 217872,
+  "dtype": "int8"
+}

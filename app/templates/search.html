@@ -1,6 +1,35 @@
 {% extends "base.html" %}
 {% from "macros.html" import search_box %}
 
+{# מדור נפרד ולא ערבוב בתוצאות: החיפוש הסמנטי חלש מהלקסיקלי לבדו,
+   ולכן הוא מוסיף בלי לדחוק. הכותרת היא שמנמיכה את הציפייה — אין כאן
+   סף ביטחון, כי נמדד שהציון אינו מפריד בין נכון לשגוי. ראה
+   app/semantic.py. #}
+{% macro also_block(items) %}
+  {% if items %}
+  {# הכותרת ניטרלית במכוון ואינה מבטיחה רלוונטיות. נמדד על 20
+     שאילתות אמיתיות שהמדור לא הציל אף אחת מארבע הפעמים שהרשימה
+     הראשית נכשלה — כותרת כמו "אולי התכוונת גם" הייתה מבטיחה יותר
+     ממה שהמדור מספק. נבחן מחדש כשיהיו יותר שאלות במאגר. #}
+  <h2 style="font-family:var(--font-serif);font-size:19px;font-weight:500;
+             margin:34px 0 14px">עוד מהמאגר</h2>
+  <ul style="list-style:none;margin:0;padding:0;display:grid;gap:10px">
+    {% for item in items %}
+    <li>
+      <a class="search__option" href="{{ item.url }}"
+         style="border:1px dashed var(--rule);background:transparent">
+        <span class="search__badge search__badge--{{ item.kind }}">{{ item.kind_label }}</span>
+        <span class="search__text">
+          <span class="search__title" style="white-space:normal">{{ item.title }}</span>
+          <span class="search__meta">{{ item.subtitle }}</span>
+        </span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endmacro %}
+
 {% block content %}
 <section class="section">
   <div class="wrap wrap--narrow">
@@ -33,6 +62,7 @@
       </li>
       {% endfor %}
     </ul>
+    {{ also_block(also) }}
 
     {% elif query %}
     <div class="empty">
@@ -43,6 +73,9 @@
       </p>
       <a class="button button--gold" href="{{ url_for('home') }}#categories">לכל הנושאים</a>
     </div>
+    {# דווקא כאן המדור שווה הכי הרבה: אין התאמה מילולית, ולפעמים
+       יש בכל זאת שאלה קרובה בנושא. #}
+    {{ also_block(also) }}
 
     {% else %}
     <div class="empty">

@@ -1,0 +1,717 @@
+[
+ {
+  "query": "הקוגל יצא קר, אפשר להניח אותו על הכיריים שדולקות מאתמול?",
+  "gold": "wnrh",
+  "style": "sentence",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "אייפון נשאר על המיטה ביום שישי בלילה אפשר להעביר אותו לסלון",
+  "gold": "uxfa",
+  "style": "messy",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "אין חוט מסביב לשכונה ואני צריך לנעול את הדלת לפני התפילה",
+  "gold": "czam",
+  "style": "sentence",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "אפשר לחתוך את הניילון של הבמבה בליל שבת?",
+  "gold": "tk6x",
+  "style": "fragment",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "הכיור מלא צלחות מהארוחה האחרונה, אפשר לנקות לפני צאת הכוכבים?",
+  "gold": "efsy",
+  "style": "sentence",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "בעלי בחו\"ל ואני לבד במוצ\"ש, מותר לי לברך על הנר והבשמים?",
+  "gold": "rva5",
+  "style": "sentence",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "בצהריים אכלנו שניצל ועכשיו הילדים רוצים גלידה, אפשר כבר?",
+  "gold": "ak7n",
+  "style": "sentence",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "סיימתי טוסט עם צהובה ורוצה ישר המבורגר",
+  "gold": "texv",
+  "style": "fragment",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "קניתי סכו\"ם ומחבת באיקאה, מה עושים איתם לפני שמשתמשים?",
+  "gold": "ctac",
+  "style": "sentence",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "כרוב ושמיר מהשוק, מספיק להעביר במים לפני הסלט?",
+  "gold": "h5yy",
+  "style": "fragment",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "עשיתי חביתה ויש נקודה אדומה קטנה בפנים צריך לזרוק הכל",
+  "gold": "fqpv",
+  "style": "messy",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "המטפלת הפיליפינית מכינה לבד תפוחי אדמה לסבתא, מותר לאכול מזה?",
+  "gold": "j2uw",
+  "style": "fragment",
+  "slice": "shabbat-kashrut",
+  "source": "agent"
+ },
+ {
+  "query": "נתקעתי בפקקים כל הבוקר ולא הספקתי כלום אפשר לפצות במנחה",
+  "gold": "e49u",
+  "style": "sentence",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "בבית הכנסת חסר לנו אחד והבן שלי בן 11 איתנו אפשר להתחיל",
+  "gold": "9uyg",
+  "style": "sentence",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "באמצע אשרי מישהו ניגש אליי לשאול שאלה מותר לי לענות לו",
+  "gold": "sbxn",
+  "style": "sentence",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "משמרת לילה שלמה ולא נגעתי במיטה מה מדלגים בבוקר",
+  "gold": "ra9s",
+  "style": "fragment",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "הבגד הלבן עם החוטים שלובשים מתחת לחולצה זה חובה על כל אחד",
+  "gold": "g43k",
+  "style": "sentence",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "מישהו עומד עם הרגליים צמודות ליד הדלת ואני חייב לצאת",
+  "gold": "bn29",
+  "style": "sentence",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "אכלתי שלושה קרואסונים בבוקר במקום ארוחה צריך ליטול ידיים",
+  "gold": "qqkq",
+  "style": "sentence",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "בקבוק פרימור אשכוליות מה אומרים עליו לפני שתייה",
+  "gold": "cmtg",
+  "style": "fragment",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "אכלתי סנדויץ בצהריים ורק עכשיו בערב הבנתי שלא אמרתי כלום",
+  "gold": "gxjp",
+  "style": "messy",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "היינו 3 בחורים באוהל עם פיתות אפשר לברך כל אחד לחוד",
+  "gold": "uyqt",
+  "style": "messy",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "נחתתי מ NY אחרי 12 שעות באוויר צריך להגיד משהו בבית כנסת",
+  "gold": "ww8f",
+  "style": "messy",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "כל הלילה הבזקים ורעש חזק בשמיים אומרים את זה בכל פעם מחדש",
+  "gold": "j2gb",
+  "style": "fragment",
+  "slice": "tefila-berachot",
+  "source": "agent"
+ },
+ {
+  "query": "ההלוויה הסתיימה אתמול ממש לפני החשכה, כמה זמן נשאר לנו?",
+  "gold": "v2xj",
+  "style": "sentence",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "נכנסתי אליהם הביתה וכולם יושבים בשקט אני צריך להגיד משהו ראשון",
+  "gold": "ksf3",
+  "style": "messy",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "אפשר להגיע למצבה של אבא בסוכות",
+  "gold": "shq9",
+  "style": "fragment",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "אבא נפתר בלילה והלוויה רק מחר בערב מה עושים עם שחרית",
+  "gold": "au49",
+  "style": "messy",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "אמא כבר שמונה חודשים לא איתנו, ויש אירוע עם תזמורת, מה עושים?",
+  "gold": "tu9d",
+  "style": "fragment",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "כבר חודש מאז שאיבדתי את אבא והזקן שלי פרוע, אפשר לסדר אותו?",
+  "gold": "ymyk",
+  "style": "sentence",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "המחזור נגמר מהר הפעם, מתי אני כבר יכולה לבדוק?",
+  "gold": "cc3v",
+  "style": "sentence",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "יש לי עכשיו מחזור, מותר להעביר לבן זוגי כוס תה?",
+  "gold": "4bth",
+  "style": "messy",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "אני לפעמים מרים יד על הקטן כשהוא לא מקשיב, זה בסדר?",
+  "gold": "tu55",
+  "style": "sentence",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "המוהל אמור להגיע אלינו ביום כיפור, זה בכלל אפשרי?",
+  "gold": "t7j5",
+  "style": "sentence",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "אני לוי, נולד לנו הילד הראשון, צריך טקס אחרי חודש?",
+  "gold": "cgyp",
+  "style": "fragment",
+  "slice": "avelut-mishpacha",
+  "source": "agent"
+ },
+ {
+  "query": "האינסטלטור גמר לתקן, אפשר להעביר לו את הכסף בשבוע הבא?",
+  "gold": "qdzn",
+  "style": "sentence",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "אמרתי בווצאפ שהעגלה שלו ועכשיו מישהו מציע לי יותר כסף",
+  "gold": "v5aj",
+  "style": "messy",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "פרסמתי ביד2 מקרר שלפעמים מפסיק לקרר צריך לספר לבחור שבא לקחת",
+  "gold": "6k33",
+  "style": "messy",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "לקחת את האוטו של אחי כשהוא לא בארץ",
+  "gold": "xaku",
+  "style": "fragment",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "תופים מהקומה מעליי כל ערב עד חצות",
+  "gold": "u3wv",
+  "style": "fragment",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "אני מימנתי את הדוכן והוא ניהל אותו, למי מגיע יותר מהכסף?",
+  "gold": "7bdk",
+  "style": "sentence",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "עשיתי נסיעת מבחן בסוכנות רכב למרות שאין לי שקל בכיס, זה בסדר?",
+  "gold": "89zg",
+  "style": "sentence",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "הבן דוד שלי אוכל עם הידיים, אפשר להגיד לו מול כולם?",
+  "gold": "8tet",
+  "style": "sentence",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "מספיק להתקשר למישהו שמאושפז או חייבים להגיע",
+  "gold": "xqfn",
+  "style": "fragment",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "התחלתי לעבוד ואני רוצה לעזור לנזקקים איזה אחוז מהסכום שנכנס לי",
+  "gold": "2anv",
+  "style": "sentence",
+  "slice": "mamonot-midot",
+  "source": "agent"
+ },
+ {
+  "query": "שמתי את המזוזה באמצע הדלת בדיוק, צריך להזיז אותה למעלה?",
+  "gold": "b5fd",
+  "style": "sentence",
+  "slice": "stam",
+  "source": "agent"
+ },
+ {
+  "query": "מזוזה בטעות על דלת חדר הרחצה",
+  "gold": "3f7m",
+  "style": "fragment",
+  "slice": "stam",
+  "source": "agent"
+ },
+ {
+  "query": "בעל הבית פירק את כל המזוזות כשעזב ממתי אני צריך לתלות",
+  "gold": "u55j",
+  "style": "messy",
+  "slice": "stam",
+  "source": "agent"
+ },
+ {
+  "query": "הבן שלי הביא מהגן ניירות מלאים בפסוקים אפשר לשים אותם בפח?",
+  "gold": "sd2p",
+  "style": "sentence",
+  "slice": "stam",
+  "source": "agent"
+ },
+ {
+  "query": "בוואטסאפ כתבו לי בעזרת השם, מותר לנקות את הצ׳אט?",
+  "gold": "h5rq",
+  "style": "messy",
+  "slice": "stam",
+  "source": "agent"
+ },
+ {
+  "query": "לשים את הגמרא על השטיח כשאין מקום על השולחן",
+  "gold": "7w3a",
+  "style": "fragment",
+  "slice": "stam",
+  "source": "agent"
+ },
+ {
+  "query": "מצאתי בארון תפילין שלא נגעו בהן עשרים שנה, אפשר להניח אותן ככה?",
+  "gold": "snxg",
+  "style": "sentence",
+  "slice": "stam",
+  "source": "agent"
+ },
+ {
+  "query": "עד איזו שעה אפשר לחסל את הבורקסים שנשארו לפני ליל הסדר?",
+  "gold": "e86w",
+  "style": "sentence",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "אבא שלי פולני והחותנת מרוקאית עושה אפונה בליל הסדר מותר לי לאכל",
+  "gold": "fwqv",
+  "style": "messy",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "בעלי רוצה לתקוע בשבילי בבית אחרי שחזר מהתפילה, אני צריכה את זה?",
+  "gold": "9pk6",
+  "style": "sentence",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "יש לי דורבן ברגל אפשר ללכת עם crocs בכיפור",
+  "gold": "mdfc",
+  "style": "messy",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "קר לי נורא בלילה בחוץ, מותר לי לחזור למיטה בבית בסוכות?",
+  "gold": "ybvy",
+  "style": "sentence",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "חזרתי מהעבודה בחצות וכולם בבית ישנים, מאוחר מדי בשביל החנוכייה?",
+  "gold": "qaeu",
+  "style": "sentence",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "רק בקבוק יין לשכן אחרי המגילה, יצאתי ידי חובה?",
+  "gold": "h3cm",
+  "style": "fragment",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "דיברתי עם חברה על המנהל שלי, לא מחמיא אבל הכל נכון",
+  "gold": "uptb",
+  "style": "fragment",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "חברה שלי מתארסת עם בחור ששמעתי שיש לו חובות ענקיים, להגיד לה?",
+  "gold": "8zph",
+  "style": "sentence",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "עובד עם אמא שלי במשרד, כולם אומרים לה רותי - גם אני יכול?",
+  "gold": "hjg9",
+  "style": "fragment",
+  "slice": "moadim-bein",
+  "source": "agent"
+ },
+ {
+  "query": "מה עושים עם קליפות של ירקות בשנת שמיטה",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "בת הזוג שלי רוצה להתגייר כמה זמן זה לוקח",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "אבא שלי מעשן שתי חפיסות ביום יש בזה איסור",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "יש לי עץ לימון בחצר צריך להפריש משהו לפני שאוכלים",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "מתגייס בעוד חודש ומחייבים אותי לגלח את הזקן",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "תרומת כליה בחיים לאדם זר",
+  "gold": null,
+  "style": "fragment",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "נשבעתי שלא אוכל מתוקים ואני מתחרט איך מתירים את זה",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "מישהו חייב לי כסף שנתיים מותר לתבוע בבית משפט",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "השכן לא שומר שבת אפשר לרמוז לו שידליק לי את המזגן",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "מותר לתת לכלב שאריות של שניצל עם גבינה",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "יש ברכה שאומרים אחרי שיוצאים מהשירותים",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "קמתי בבוקר ונגעתי באוכל לפני ששטפתי ידיים זה בעיה",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "התחתנתי לפני חודש חייבת לכסות את השיער עם פאה",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "קניתי מעיל צמר בחול צריך לבדוק אם יש בו פשתן",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "יש לי קעקוע ישן אפשר להיקבר בבית קברות יהודי",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "בחג אפשר לבשל רגיל או שזה אסור כמו בשבת",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "גר בקומה שביעית איפה מדליקים חנוכיה",
+  "gold": null,
+  "style": "fragment",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "אני לא סובל אלכוהול כמה חייבים לשתות בפורים",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "מה ההבדל בין מצה רגילה למצה שמורה בליל הסדר",
+  "gold": null,
+  "style": "sentence",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "כאב ראש חזק בצום מותר לקחת אקמול",
+  "gold": null,
+  "style": "fragment",
+  "slice": "absent",
+  "source": "agent"
+ },
+ {
+  "query": "שכחתי להדליק נרות מה עושים",
+  "gold": "th5n",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "אכלתי המבורגר מתי אפשר גלידה",
+  "gold": "ak7n",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner",
+  "tuned": true
+ },
+ {
+  "query": "בישלתי בטעות בשר בסיר חלבי",
+  "gold": "nqfz",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "מה מברכים על שוקולד",
+  "gold": null,
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "אפשר לפתוח מקרר בשבת",
+  "gold": null,
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "אבא שלי נפטר מה צריך לעשות",
+  "gold": "v2xj",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "שכחתי לספור עומר יום אחד",
+  "gold": "5m3s",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "מותר לשמוע מוזיקה בבין המצרים",
+  "gold": null,
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "איך מכשירים כלים חדשים",
+  "gold": "ctac",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "כמה כסף צריך לתת לצדקה",
+  "gold": "2anv",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "מותר להשתמש בטלפון בשבת בשביל פיקוח נפש",
+  "gold": null,
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "מתי מברכים ברכת הגומל",
+  "gold": "ww8f",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "איפה שמים מזוזה בדלת",
+  "gold": "b5fd",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "אפשר לגזוז ציפורניים בספירת העומר",
+  "gold": null,
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "מה עושים אם אכלתי בלי לברך",
+  "gold": "gxjp",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "מותר לנסוע לים בתשעת הימים",
+  "gold": null,
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "הילד שלי בן 5 חייב להתפלל",
+  "gold": "7cpb",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "שכחתי יעלה ויבוא מה עושים",
+  "gold": "u4k3",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "אפשר לתת מתנה לגוי בחג שלהם",
+  "gold": null,
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ },
+ {
+  "query": "מה הדין של אוכל שנשאר על הפלטה",
+  "gold": "wnrh",
+  "style": "sentence",
+  "slice": "owner",
+  "source": "owner"
+ }
+]
