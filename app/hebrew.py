@@ -88,12 +88,22 @@ def index_text(*parts: str | None) -> str:
     return " ".join(tokens)
 
 
-def fts_query(raw: str, *, prefix: bool = True) -> str:
+def fts_query(raw: str, *, prefix: bool = True, join: str = "AND") -> str:
     """הופך קלט חופשי לשאילתת FTS5 בטוחה.
 
     לא מעבירים קלט משתמש ל-FTS5 כמו שהוא: תווים כמו ``*``, ``:``, ``^``
     ו-``NEAR`` הם תחביר, וקלט שבור מפיל את השאילתה. לכן מפרקים לטוקנים
     בעצמנו ומרכיבים מחדש רק ממחרוזות במרכאות.
+
+    ``join`` קובע אם כל המילים נדרשות. ``AND`` הוא ברירת המחדל
+    ההיסטורית, אבל הוא מחייב שכל מילה בשאילתה תופיע באותה שאלה —
+    ולכן שאילתה טבעית בת שמונה מילים כמעט תמיד מחזירה כלום. מדידה על
+    62 שאילתות (``scripts/eval_retrieval.py``): ``AND`` החזיר אפס
+    תוצאות ב-100% מהמקרים, ``OR`` הגיע ל-27% במקום הראשון. לכן
+    ``db.search`` מעביר ``OR`` במפורש.
+
+    ``related_questions`` ממשיך ב-``AND`` **במכוון**: שם הענף מייצר
+    צירוף בן עשרות מילים, והשפעת המעבר ל-``OR`` לא נמדדה.
     """
     tokens = tokenize(raw)
     if not tokens:
@@ -110,7 +120,7 @@ def fts_query(raw: str, *, prefix: bool = True) -> str:
             quoted = '"' + stem.replace('"', "") + '"'
             variants.append(quoted + "*" if prefix else quoted)
         clauses.append("(" + " OR ".join(variants) + ")")
-    return " AND ".join(clauses)
+    return f" {join} ".join(clauses)
 
 
 def slugify(text: str, *, max_words: int = 8, max_chars: int = 70) -> str:

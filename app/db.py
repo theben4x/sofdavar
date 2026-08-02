@@ -350,7 +350,7 @@ def search(query: str, limit: int = 12) -> list[dict[str, Any]]:
     """
     numeric = _search_by_number(query.strip(), limit) if query.strip().isdigit() else []
 
-    match = fts_query(query)
+    match = fts_query(query, join="OR")
     if not match:
         return _hydrate(numeric[:limit])
 
@@ -388,6 +388,34 @@ def search(query: str, limit: int = 12) -> list[dict[str, Any]]:
 
     scored.sort(key=lambda item: -item[0])
     return _hydrate(scored[:limit])
+
+
+def suggestions(query: str, exclude: Iterable[str] = (), limit: int = 4) -> list[dict[str, Any]]:
+    """שאלות קרובות במשמעות, למדור "עוד מהמאגר".
+
+    מסננות החוצה כל שאלה שכבר מופיעה בתוצאות הרגילות — כפילות במסך
+    היא הדבר היחיד שהופך את המדור הזה למטרד במקום לעזרה. הציון של
+    ``_hydrate`` אינו בשימוש כאן, כי הסדר כבר נקבע לפי הדמיון.
+    """
+    # הבדיקה קודמת לייבוא במכוון: כשהמדור כבוי, ``numpy`` והמודל אינם
+    # נטענים בכלל, ולכן הכיבוי חוסך גם זיכרון וגם זמן עלייה.
+    if not current_app.config.get("SEMANTIC_SUGGESTIONS"):
+        return []
+
+    from . import semantic
+
+    skip = set(exclude)
+    codes = [c for c in semantic.suggest_codes(query, limit + len(skip)) if c not in skip]
+    if not codes:
+        return []
+
+    rows = get_db().execute(
+        f"SELECT id, code FROM questions WHERE code IN ({','.join('?' * len(codes))})",
+        codes,
+    ).fetchall()
+    by_code = {row["code"]: row["id"] for row in rows}
+    ordered = [(0.0, "question", by_code[c]) for c in codes if c in by_code]
+    return _hydrate(ordered[:limit])
 
 
 def _hydrate(scored: list[tuple[float, str, int]]) -> list[dict[str, Any]]:
@@ -442,6 +470,10 @@ def _hydrate(scored: list[tuple[float, str, int]]) -> list[dict[str, Any]]:
                 "subtitle": row["category_name"],
                 "number": row["number"],
                 "url": f"/q/{row['code']}",
+                # ``code`` משמש את ``suggestions`` כדי לא להציג פעמיים
+                # שאלה שכבר מופיעה למעלה. ה-JS מתעלם ממפתחות שאינו
+                # מכיר, ולכן התוספת אינה משנה את התצוגה.
+                "code": row["code"],
             })
     return results
 

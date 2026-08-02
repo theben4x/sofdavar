@@ -88,8 +88,15 @@ def main() -> int:
         slug = group["category"]
         category_id = category_ids.get(slug)
         if category_id is None:
-            print(f"  ! קטגוריה לא מוכרת: {slug} — מדלג")
-            continue
+            # דילוג שקט כאן עלה פעם בשישים שאלות שנכתבו ולא הגיעו לאתר:
+            # ההודעה נדפסה בכל בנייה ואיש לא הבחין בה. קטגוריה לא מוכרת
+            # היא שגיאת נתונים, ולכן היא מפילה את הבנייה. שאלה שממתינה
+            # לנושא נשמרת ב-data/seed/questions_pending.json ואינה נטענת.
+            raise SystemExit(
+                f"  ! קטגוריה לא מוכרת: {slug} — {len(group.get('questions', []))} שאלות\n"
+                f"    הוסיפו אותה ל-data/seed/categories.json, או העבירו את השאלות\n"
+                f"    ל-data/seed/questions_pending.json. אין דילוג שקט."
+            )
 
         taken: set[str] = set()
         for order, item in enumerate(group.get("questions", [])):

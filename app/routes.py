@@ -77,6 +77,30 @@ def _remember_city(html: str, city: zmanim.City, chosen: bool) -> Response:
     return response
 
 
+def _codes(results: Iterable[dict]) -> list[str]:
+    """קודי השאלות שכבר מוצגות, כדי שההצעות לא יחזרו עליהן."""
+    return [r["code"] for r in results if r.get("code")]
+
+
+def _log_empty(query: str, where: str) -> None:
+    """רושם חיפוש שלא החזיר כלום.
+
+    זו הרשימה של מה שחסר במאגר: כל שורה כאן היא אדם שחיפש ולא מצא.
+    נכתב ל-stdout ולא לקובץ, כי מערכת הקבצים ב-Vercel אינה ניתנת
+    לכתיבה והמופע נמחק בין בקשות.
+
+    נרשמת השאילתה בלבד. אין כאן כתובת IP, מזהה משתמש או עוגייה —
+    המטרה היא פערי תוכן, לא מעקב.
+    """
+    if not current_app.config.get("LOG_EMPTY_SEARCHES"):
+        return
+    # דורש לפחות אות או ספרה אחת: "?!?" עובר את הנרמול כמו שהוא, ורשימת
+    # הפערים צריכה להישאר רשימה של שאלות ולא של הקלדות מקריות.
+    if not any(ch.isalnum() for ch in normalize(query)):
+        return
+    current_app.logger.info('no-results where=%s q="%s"', where, query.replace('"', "'"))
+
+
 def _breadcrumbs(*items: tuple[str, str]) -> dict:
     """BreadcrumbList — עוזר לגוגל להציג את מסלול הניווט בתוצאות."""
     return {
@@ -204,16 +228,28 @@ def register_routes(app: Flask) -> None:
     def api_search():
         query = (request.args.get("q") or "").strip()
         if not normalize(query).strip():
-            return jsonify({"query": query, "results": []})
-        return jsonify({"query": query, "results": db.search(query, limit=10)})
+            return jsonify({"query": query, "results": [], "also": []})
+        results = db.search(query, limit=10)
+        if not results:
+            _log_empty(query, "api")
+        return jsonify({
+            "query": query,
+            "results": results,
+            # מדור נפרד ולא ערבוב — ראה app/semantic.py
+            "also": db.suggestions(query, _codes(results), limit=3),
+        })
 
     @app.route("/search")
     def search_page():
         """תוצאות מלאות. קיים גם כדי שהחיפוש יעבוד בלי JavaScript."""
         query = (request.args.get("q") or "").strip()
         results = db.search(query, limit=50) if normalize(query).strip() else []
+        if query and not results:
+            _log_empty(query, "page")
+        also = db.suggestions(query, _codes(results), limit=4) if results or query else []
         return render_template(
             "search.html",
+            also=also,
             meta=_meta(
                 f'שאלו אותי: {query}' if query else "שאלו אותי",
                 f'תוצאות חיפוש עבור "{query}" במאגר סוף דבר.' if query
