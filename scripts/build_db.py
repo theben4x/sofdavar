@@ -81,6 +81,7 @@ def main() -> int:
     # ---- שאלות -------------------------------------------------------------
     questions = load("questions.json", [])
     inserted = 0
+    drafts = 0
     # קודי הכתובת חייבים להיות ייחודיים על פני כל המאגר, לא רק בקטגוריה.
     codes: set[str] = set()
     missing_codes: list[str] = []
@@ -100,6 +101,12 @@ def main() -> int:
 
         taken: set[str] = set()
         for order, item in enumerate(group.get("questions", [])):
+            # שאלה בטיוטה אינה נטענת למסד כלל, ולכן אינה יכולה להופיע
+            # באתר בשום מסלול — לא בחיפוש, לא בעמוד הנושא ולא בכתובת
+            # ישירה. האישור הוא שינוי status ל-"published" והרצה מחדש.
+            if (item.get("status") or "published") == "draft":
+                drafts += 1
+                continue
             question_slug = unique_slug(slugify(item["question"]), taken)
             code = (item.get("code") or "").strip()
             if not is_code(code) or code in codes:
@@ -112,8 +119,9 @@ def main() -> int:
                 """
                 INSERT INTO questions (
                     category_id, code, slug, number, question, short_answer, body,
-                    sources, minhag_ashkenaz, minhag_sepharad, keywords, sort_order
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    sources, minhag_ashkenaz, minhag_sepharad, keywords,
+                    answer_kind, sort_order
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     category_id,
@@ -127,11 +135,14 @@ def main() -> int:
                     item.get("minhag_ashkenaz") or None,
                     item.get("minhag_sepharad") or None,
                     json.dumps(item.get("keywords", []), ensure_ascii=False),
+                    "reference" if item.get("draft_kind") == "reference_only" else "full",
                     order,
                 ),
             )
             inserted += 1
     print(f"  · {inserted} שאלות")
+    if drafts:
+        print(f"  · {drafts} בטיוטה — לא נטענו, לא מופיעות באתר")
     if missing_codes:
         print(f"  ! {len(missing_codes)} שאלות ללא code בקובץ ה-seed — נגזר קוד זמני מגיבוב הטקסט.")
         print("    הריצו scripts/assign_codes.py ושמרו את התוצאה ב-git, אחרת הכתובת")

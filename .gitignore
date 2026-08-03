@@ -20,3 +20,11 @@ desktop.ini
 .vscode/
 .idea/
 *.swp
+
+# תוצרי ביניים של סבבי הניסוח לשאלות השבת. נשמרים מקומית כתיעוד של מה
+# שנוסה ונפסל (העתקה מהספר, תוספת פסק), אך אינם נכסים של הפרויקט —
+# הראיות שנדרשות לסקירת הטיוטות יושבות ב-data/review/.
+draft_review*.json
+draft_final.json
+run566_final.json
+data/seed/units_wanted.json

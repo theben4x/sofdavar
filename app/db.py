@@ -49,6 +49,9 @@ CREATE TABLE IF NOT EXISTS questions (
     minhag_ashkenaz TEXT,
     minhag_sepharad TEXT,
     keywords        TEXT    NOT NULL DEFAULT '[]',
+    -- 'full' = תשובה מנוסחת; 'reference' = הפניה למקורות בלבד.
+    -- מוצג אחרת בעמוד השאלה, ומדורג נמוך יותר בחיפוש.
+    answer_kind     TEXT    NOT NULL DEFAULT 'full',
     sort_order      INTEGER NOT NULL,
     UNIQUE (category_id, slug)
 );
@@ -318,6 +321,11 @@ _CONTAINS_BONUS = 2.5
 #: נושא הוא יעד רחב יותר משאלה בודדת, ולכן מקבל דחיפה קלה בתיקו.
 _CATEGORY_BONUS = 1.5
 
+#: קנס לשאלה שאין לה תשובה מנוסחת אלא הפניה למקורות בלבד. גדול דיו כדי
+#: שתשובה מלאה תמיד תקדם להפניה על אותה שאילתה, וקטן דיו כדי שהפניה
+#: רלוונטית תקדים תשובה מלאה שאינה קשורה.
+_REFERENCE_PENALTY = 8.0
+
 
 def _search_by_number(digits: str, limit: int) -> list[tuple[float, str, int]]:
     """שאלות שמספרן מתחיל בספרות שהוקלדו.
@@ -385,6 +393,25 @@ def search(query: str, limit: int = 12) -> list[dict[str, Any]]:
         if row["kind"] == "category":
             score += _CATEGORY_BONUS
         scored.append((score, row["kind"], row["ref_id"]))
+
+    # הפניות יורדות מתחת לתשובות המנוסחות. שאילתה אחת נוספת ולא עמודה
+    # באינדקס ה-FTS: ``search`` היא טבלה וירטואלית שנבנית מחדש בכל בנייה,
+    # והוספת שדה לה מחייבת אינדוקס מחדש של כל המאגר.
+    question_ids = [i for _, k, i in scored if k == "question"]
+    if question_ids:
+        rows = get_db().execute(
+            f"""SELECT id FROM questions
+                WHERE answer_kind = 'reference'
+                  AND id IN ({",".join("?" * len(question_ids))})""",
+            question_ids,
+        ).fetchall()
+        reference = {r["id"] for r in rows}
+        if reference:
+            scored = [
+                (score - _REFERENCE_PENALTY if kind == "question" and ref in reference else score,
+                 kind, ref)
+                for score, kind, ref in scored
+            ]
 
     scored.sort(key=lambda item: -item[0])
     return _hydrate(scored[:limit])

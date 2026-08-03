@@ -25,10 +25,22 @@
 
   <section style="padding-bottom:16px">
     <div class="wrap wrap--narrow">
-      <div class="answer-direct">
-        <span class="answer-direct__label">התשובה בקצרה</span>
+      {# שאלה שאין לה תשובה מנוסחת אלא הפניה למקורות מוצגת אחרת, כדי
+         שהמבקר יידע מה הוא מקבל לפני שהוא קורא. "התשובה בקצרה" מעל
+         שורת הפניה היא הבטחה שאינה מקוימת. #}
+      {% set is_reference = question.answer_kind == 'reference' %}
+      <div class="answer-direct{% if is_reference %} answer-direct--reference{% endif %}">
+        <span class="answer-direct__label">
+          {{ 'מקורות לעיון' if is_reference else 'התשובה בקצרה' }}
+        </span>
         {{ question.short_answer }}
       </div>
+      {% if is_reference %}
+      <p class="answer-note">
+        לשאלה זו לא נכתבה כאן תשובה מנוסחת. המקורות שלמטה הם המקום שבו הדין
+        נדון, ויש לעיין בהם או לשאול רב.
+      </p>
+      {% endif %}
 
     </div>
   </section>
