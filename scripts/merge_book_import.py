@@ -63,9 +63,13 @@ def texts(item: dict) -> list[str]:
     return out
 
 
-def check(item: dict, where: str, problems: list[str]) -> bool:
+def check(item: dict, where: str, problems: list[str], *, need_category: bool = True) -> bool:
+    """‏``need_category`` כבוי לשאלה שכבר במאגר: שם הקטגוריה יושב על
+    הקבוצה שהשאלה נמצאת בה, ואינו שדה של השאלה עצמה."""
     ok = True
     for field in REQUIRED:
+        if field == "category" and not need_category:
+            continue
         if not str(item.get(field, "")).strip():
             problems.append(f"{where}: חסר {field}")
             ok = False
@@ -154,7 +158,7 @@ def main() -> int:
                 candidate[field] = str(item[field]).strip()
         if item.get("question"):
             candidate["question"] = str(item["question"]).strip()
-        if not check(candidate, f"תשובה {code}", problems):
+        if not check(candidate, f"תשובה {code}", problems, need_category=False):
             continue
         # הפרסום קורה כאן ורק כאן: יש תשובה, ולכן אין עוד מה להמתין לו.
         candidate.pop("status", None)
