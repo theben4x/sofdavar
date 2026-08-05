@@ -29,12 +29,37 @@
 
 <section style="padding-bottom:54px">
   <div class="wrap wrap--narrow">
-    {% if questions %}
+    {% if sections %}
+    {# רשימת הקפיצה היא ניווט אמיתי ולכן <nav> עם שם, ולא רק שורת קישורים.
+       הקישורים הם עוגנים רגילים ולכן עובדים בלי JS. #}
+    <nav class="topic-nav" aria-label="תת-נושאים">
+      {% for section in sections %}
+      <a class="topic-nav__link" href="#{{ section.slug }}">
+        {{ section.name }}<span class="topic-nav__count">{{ section.questions | length }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+
+    {% for section in sections %}
+    <section class="topic-block">
+      <h2 class="topic-block__title" id="{{ section.slug }}">{{ section.name }}</h2>
+      <div class="qa-list">
+        {% for question in section.questions %}
+          {{ qa_accordion_item(question) }}
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+
+    {% elif questions %}
     <div class="qa-list">
       {% for question in questions %}
         {{ qa_accordion_item(question) }}
       {% endfor %}
     </div>
+    {% endif %}
+
+    {% if questions %}
 
     <p class="disclaimer">
       בעמוד הזה מוצגת התשובה הישירה בלבד. התשובה המלאה, המקורות והבדלי המנהג

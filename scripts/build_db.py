@@ -120,8 +120,8 @@ def main() -> int:
                 INSERT INTO questions (
                     category_id, code, slug, number, question, short_answer, body,
                     sources, minhag_ashkenaz, minhag_sepharad, keywords,
-                    answer_kind, sort_order
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    answer_kind, topic, sort_order
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     category_id,
@@ -136,6 +136,7 @@ def main() -> int:
                     item.get("minhag_sepharad") or None,
                     json.dumps(item.get("keywords", []), ensure_ascii=False),
                     "reference" if item.get("draft_kind") == "reference_only" else "full",
+                    item.get("topic") or "",
                     order,
                 ),
             )

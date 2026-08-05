@@ -52,6 +52,9 @@ CREATE TABLE IF NOT EXISTS questions (
     -- 'full' = תשובה מנוסחת; 'reference' = הפניה למקורות בלבד.
     -- מוצג אחרת בעמוד השאלה, ומדורג נמוך יותר בחיפוש.
     answer_kind     TEXT    NOT NULL DEFAULT 'full',
+    -- תת-נושא בתוך הקטגוריה, לחלוקת עמוד הנושא בלבד. ריק הוא מצב תקין:
+    -- קטגוריה קטנה אינה צריכה חלוקה, ואז העמוד מוצג כרשימה אחת.
+    topic           TEXT    NOT NULL DEFAULT '',
     sort_order      INTEGER NOT NULL,
     UNIQUE (category_id, slug)
 );

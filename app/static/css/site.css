@@ -1230,6 +1230,55 @@ img, svg { max-width: 100%; }
 }
 
 .qa-item { border-bottom: 1px solid var(--rule); }
+
+/* ---- חלוקת עמוד הנושא לתת-נושאים -------------------------------------
+   נכנס רק כשיש למעלה מתת-נושא אחד, ולכן עשרים הקטגוריות הקטנות נראות
+   בדיוק כשהיו. הרשימה למעלה היא קיצור דרך, לא תפריט: היא נגללת עם
+   העמוד ואינה נדבקת, כדי לא לגזול גובה מסך בנייד. */
+.topic-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 30px;
+}
+
+.topic-nav__link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.topic-nav__link:hover,
+.topic-nav__link:focus-visible {
+  border-color: var(--gold-ring);
+  background: var(--gold-veil);
+}
+
+.topic-nav__count {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+
+.topic-block + .topic-block { margin-top: 34px; }
+
+.topic-block__title {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 2.2vw, 23px);
+  font-weight: 700;
+  color: var(--gold-deep);
+  margin-bottom: 12px;
+  /* קפיצה לעוגן מתחת לכותרת חותכת אותה. הרווח הזה מחזיר אותה למסך. */
+  scroll-margin-top: 18px;
+}
 .qa-item:last-child { border-bottom: 0; }
 
 .qa-item__summary {

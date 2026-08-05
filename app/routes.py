@@ -423,6 +423,23 @@ def register_routes(app: Flask) -> None:
             abort(404)
         questions = db.questions_in_category(data["id"])
         path = f"/{category_slug}"
+
+        # חלוקה לתת-נושאים. הסדר הוא סדר ההופעה הראשונה ולא סדר שרירותי:
+        # השאלות נכתבו לפי סדר הלימוד בנושא, וכך גם ייקראו. קטגוריה שאין
+        # בה תת-נושאים מקבלת קבוצה אחת בלי כותרת, ולכן העמוד לא משתנה
+        # עבור עשרים הקטגוריות הקטנות.
+        sections: list[dict[str, Any]] = []
+        index: dict[str, dict[str, Any]] = {}
+        for item in questions:
+            name = (item.get("topic") or "").strip()
+            group = index.get(name)
+            if group is None:
+                group = {"name": name, "slug": f"t{len(sections) + 1}", "questions": []}
+                index[name] = group
+                sections.append(group)
+            group["questions"].append(item)
+        if len(sections) < 2:
+            sections = []
         return render_template(
             "category.html",
             meta=_meta(
@@ -433,6 +450,7 @@ def register_routes(app: Flask) -> None:
             ),
             category=data,
             questions=questions,
+            sections=sections,
         )
 
     @app.route("/q/<code>")
