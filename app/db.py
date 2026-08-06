@@ -8,14 +8,15 @@
 from __future__ import annotations
 
 import json
+import math
 import sqlite3
 from datetime import date
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, NamedTuple
 
 from flask import current_app, g
 
-from .hebrew import fts_query, index_text, normalize
+from .hebrew import fts_query, index_text, normalize, stems, tokenize
 
 SCHEMA = """
 PRAGMA journal_mode = WAL;
@@ -88,6 +89,15 @@ CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5 (
     ref_id UNINDEXED,
     tokenize = 'unicode61 remove_diacritics 2',
     prefix  = '1 2 3 4'
+);
+
+-- בכמה שאלות מופיע כל גזע. זה מה שמבדיל מילה שנושאת מידע ממילת מילוי:
+-- "מישהו" ו"מותר" מופיעים כמעט בכל שאלה, ו"שמיטה" בבודדות. בלי ההבחנה
+-- הזאת שאילתה כמו "מישהו חייב לי כסף מותר לתבוע בבית משפט" מתאימה את
+-- עצמה לשלוש שאלות שבת שמתחילות ב"מישהו", והאתר עונה עליה בביטחון.
+CREATE TABLE IF NOT EXISTS stem_df (
+    stem TEXT PRIMARY KEY,
+    n    INTEGER NOT NULL
 );
 """
 
@@ -324,6 +334,25 @@ _CONTAINS_BONUS = 2.5
 #: נושא הוא יעד רחב יותר משאלה בודדת, ולכן מקבל דחיפה קלה בתיקו.
 _CATEGORY_BONUS = 1.5
 
+#: איזה חלק מן המידע שבשאילתה חייב להימצא בתוצאה כדי שהיא תוצג.
+#: מכויל על ``scripts/eval_retrieval.py --evidence`` (102 שאילתות):
+#:
+#:      סף     Recall@1   טעות בטוחה   נמנע כראוי   אפס תוצאות
+#:      אין      25.3%       64.0%         0.0%         0.0%
+#:      0.20     24.0%       46.7%         3.7%        18.7%
+#:      0.28     21.3%       26.7%        29.6%        44.0%
+#:      0.34     17.3%       13.3%        44.4%        64.0%
+#:      0.45     14.7%        2.7%        70.4%        78.7%
+#:
+#: 0.20 נבחר כי הוא היחיד שכמעט אינו עולה דבר: הדיוק במקום הראשון יורד
+#: ב-1.3 נקודות בלבד, והתשובות הבטוחות-והשגויות יורדות ב-17 נקודות.
+#: הספים הגבוהים מוחקים את הטעויות אבל משתיקים את החיפוש גם בשאלות
+#: שיש להן תשובה — ב-0.34 שני שלישים מהשאילתות חוזרות ריקות.
+#: הדרך להעלות את הסף בלי לשלם היא להרחיב את ``keywords`` בניסוחים
+#: שאנשים באמת מקלידים; היום "קוגל" ו"כיריים" אינם במאגר, ולכן שאלה
+#: שנשאלה בלשונם נראית כאילו אין עליה תשובה.
+MIN_EVIDENCE = 0.20
+
 #: קנס לשאלה שאין לה תשובה מנוסחת אלא הפניה למקורות בלבד. גדול דיו כדי
 #: שתשובה מלאה תמיד תקדם להפניה על אותה שאילתה, וקטן דיו כדי שהפניה
 #: רלוונטית תקדים תשובה מלאה שאינה קשורה.
@@ -352,6 +381,82 @@ def _search_by_number(digits: str, limit: int) -> list[tuple[float, str, int]]:
     ]
 
 
+class QueryTerms(NamedTuple):
+    """כמה מידע יש בשאילתה, ובמה אפשר להוכיח שתוצאה עונה עליה.
+
+    ``mass`` הוא סכום המשקל של המילים נושאות המידע. אפס פירושו שהשאלה
+    כולה מילות מילוי ("שבת", "מה מותר") — אין במה לסנן, ואין להחמיר.
+    ``terms`` הוא זוג לכל מילה כזו: הגזעים שהתאמה בהם נחשבת ראיה,
+    והמשקל שלה. מילה שאין לה זכר במאגר מקבלת משקל גבוה ו**קבוצת ראיות
+    ריקה** — היא לעולם לא תסומן כנמצאה, ולכן היא מושכת את השאלה כולה
+    להימנעות. זו בדיוק ההתנהגות הרצויה: שאלה על שמיטה, כשאין במאגר
+    שמיטה, צריכה לקבל "לא מצאתי" ולא שאלה על מיטה מתקפלת.
+    """
+
+    mass: float
+    terms: tuple[tuple[frozenset[str], float], ...]
+
+    def evidence_ratio(self, indexed: set[str]) -> float:
+        """איזה חלק מן המידע שבשאילתה נמצא במסמך."""
+        if self.mass <= 0:
+            return 1.0
+        found = sum(w for stems_, w in self.terms if stems_ & indexed)
+        return found / self.mass
+
+
+def query_terms(
+    query: str, *, conn: sqlite3.Connection | None = None, ratio: float = 0.10
+) -> QueryTerms:
+    """מפרק שאילתה למילים נושאות מידע, ומשקלל כל אחת לפי נדירותה.
+
+    "מישהו", "מותר" ו"מה" מופיעים כמעט בכל שאלה במאגר, ולכן התאמה בהם
+    אינה אומרת דבר. "שמיטה" או "משפט" מופיעים במעט מאוד — או בכלל לא —
+    ולכן דווקא הם מעידים על מה השאלה. סף בינארי לא הספיק כאן: "מישהו"
+    מופיע בכשלושים שאלות, עבר כל סף סביר, ולבדו הספיק כדי ש"מישהו חייב
+    לי כסף — מותר לתבוע בבית משפט" יימצא כאילו נענתה. לכן המידה היא
+    **חלק מן המשקל** ולא "התאמה אחת מספיקה".
+    """
+    families = [stems(token) for token in tokenize(query)]
+    if not families:
+        return QueryTerms(0.0, ())
+
+    db = conn if conn is not None else get_db()
+    row = db.execute("SELECT value FROM meta WHERE key = 'question_total'").fetchone()
+    total = json.loads(row["value"]) if row else 0
+    if not total:
+        return QueryTerms(0.0, ())
+
+    # רצפה של 3: במאגר קטן כל גזע נדיר, וסף יחסי לבדו היה מכריז על הכול
+    # כאינפורמטיבי ומביא את החיפוש להימנע מלענות כמעט תמיד.
+    cutoff = max(3, int(total * ratio))
+    ordered = sorted({stem for family in families for stem in family})
+    found = db.execute(
+        f"SELECT stem, n FROM stem_df WHERE stem IN ({','.join('?' * len(ordered))})",
+        ordered,
+    ).fetchall()
+    frequency = {r["stem"]: r["n"] for r in found}
+
+    terms: list[tuple[frozenset[str], float]] = []
+    mass = 0.0
+    for family in families:
+        own_frequency = frequency.get(family[0], 0)
+        if own_frequency > cutoff:
+            continue  # מילה נפוצה — התאמה בה אינה מעידה על דבר
+        # משקל IDF. חצי במכנה כדי שמילה שאינה במאגר תקבל את המשקל הגבוה
+        # ביותר במקום חלוקה באפס.
+        weight = math.log(total / max(own_frequency, 0.5))
+        # הגזעים המקוצרים נכנסים כראיה רק אם הם עצמם קיימים במאגר.
+        # ``stems`` מסירה אותיות שימוש, ומ"שמיטה" נולדת "מיטה" — צורה
+        # מקרית שאינה תרגום של המילה. מילה שאין לה זכר במאגר נשארת בלי
+        # ראיות בכוונה.
+        evidence = frozenset(
+            s for s in family if own_frequency and 0 < frequency.get(s, 0) <= cutoff
+        )
+        terms.append((evidence, weight))
+        mass += weight
+    return QueryTerms(mass, tuple(terms))
+
+
 def search(query: str, limit: int = 12) -> list[dict[str, Any]]:
     """חיפוש מאוחד שמחזיר נושאים ושאלות מסומנים לפי הסוג.
 
@@ -368,7 +473,7 @@ def search(query: str, limit: int = 12) -> list[dict[str, Any]]:
     try:
         rows = get_db().execute(
             """
-            SELECT s.kind, s.ref_id, s.title, bm25(search, 10.0, 1.0) AS rank
+            SELECT s.kind, s.ref_id, s.title, s.body, bm25(search, 10.0, 1.0) AS rank
             FROM search s
             WHERE search MATCH ?
             ORDER BY rank
@@ -380,11 +485,21 @@ def search(query: str, limit: int = 12) -> list[dict[str, Any]]:
         # שאילתה שה-FTS דחה. עדיף רשימה ריקה מאשר 500 למשתמש שמקליד.
         return []
 
+    # ``OR`` מבטיח שתמיד תחזור תוצאה כלשהי, וזו בדיוק הבעיה: שאילתה על
+    # נושא שאין עליו תשובה נתפסת על מילות המילוי שלה. נמדד על ערכת
+    # ההערכה — התוצאה הראשונה הגיעה מנושא אחר לגמרי ב-64% מהמקרים,
+    # והאתר מעולם לא אמר "לא מצאתי". לכן תוצאה שאינה חולקת עם השאילתה
+    # אף מילה נושאת מידע נפסלת. כששאלו רק במילים נפוצות ("שבת") אין
+    # במה לסנן, והתנהגות החיפוש נשארת כשהייתה.
+    terms = query_terms(query)
+
     needle = normalize(query).strip()
     scored: list[tuple[float, str, int]] = list(numeric)
     seen_numeric = {ref for _, _, ref in numeric}
     for row in rows:
         if row["kind"] == "question" and row["ref_id"] in seen_numeric:
+            continue
+        if terms.evidence_ratio(set((row["body"] or "").split())) < MIN_EVIDENCE:
             continue
         score = -float(row["rank"])
         title = normalize(row["title"])
@@ -543,18 +658,30 @@ def rebuild_search_index(conn: sqlite3.Connection) -> int:
     rows = conn.execute(
         "SELECT id, question, short_answer, body, keywords FROM questions"
     ).fetchall()
+    # שכיחות הגזעים נספרת מאותו טקסט בדיוק שנכנס לאינדקס, ולא מנוסח
+    # השאלה בלבד: אחרת גזע שמופיע רק במילות המפתח היה נראה כאילו אינו
+    # במאגר כלל, והחיפוש היה נמנע מלענות דווקא כשיש לו תשובה טובה.
+    document_frequency: dict[str, int] = {}
     payload = []
     for r in rows:
         body_parts = json.loads(r["body"] or "[]")
         keywords = json.loads(r["keywords"] or "[]")
-        payload.append((
-            index_text(r["question"]),
-            index_text(r["question"], r["short_answer"], *body_parts, *keywords),
-            r["id"],
-        ))
+        body_index = index_text(r["question"], r["short_answer"], *body_parts, *keywords)
+        for stem in set(body_index.split()):
+            document_frequency[stem] = document_frequency.get(stem, 0) + 1
+        payload.append((index_text(r["question"]), body_index, r["id"]))
     conn.executemany(
         "INSERT INTO search (title, body, kind, ref_id) VALUES (?, ?, 'question', ?)",
         payload,
+    )
+
+    conn.execute("DELETE FROM stem_df")
+    conn.executemany(
+        "INSERT INTO stem_df (stem, n) VALUES (?, ?)", document_frequency.items()
+    )
+    conn.execute(
+        "INSERT OR REPLACE INTO meta (key, value) VALUES ('question_total', ?)",
+        (json.dumps(len(rows)),),
     )
 
     conn.commit()

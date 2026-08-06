@@ -92,6 +92,36 @@ def lexical(conn, query: str, *, join: str, limit: int) -> list[str]:
         dbmod.fts_query = original
 
 
+def gated(conn, query: str, *, limit: int, floor: float) -> list[str]:
+    """לקסיקלי OR, אבל תוצאה שאין בה מספיק מן המידע שבשאילתה נפסלת.
+
+    זו השיטה שרצה באתר (``app.db.search``). היא נמדדת כאן כדי שהסף
+    ייקבע מן המספרים ולא מן התחושה — במיוחד "נמנע כראוי", שהוא כל
+    מטרתה: 27 מן השאילתות בערכה הן שאלות שאין להן תשובה במאגר.
+    """
+    match = hebrew.fts_query(query, join="OR")
+    if not match:
+        return []
+    try:
+        rows = conn.execute(
+            """
+            SELECT q.code, s.body FROM search s
+            JOIN questions q ON q.id = s.ref_id
+            WHERE search MATCH ? AND s.kind = 'question'
+            ORDER BY bm25(search, 8.0, 4.0, 2.0, 1.0) LIMIT ?
+            """,
+            (match, limit),
+        ).fetchall()
+    except Exception:
+        return []
+    terms = dbmod.query_terms(query, conn=conn)
+    return [
+        row["code"]
+        for row in rows
+        if terms.evidence_ratio(set((row["body"] or "").split())) >= floor
+    ]
+
+
 def fuse(*rankings: list[str], limit: int) -> list[str]:
     """מיזוג דירוגים — כל שיטה תורמת 1/(k+מקום), והסכום קובע."""
     score: dict[str, float] = {}
@@ -105,6 +135,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--floor", type=float, default=0.0,
                         help="סף דמיון סמנטי; מתחתיו נחשב 'אין תשובה'")
+    parser.add_argument("--evidence", type=float, default=dbmod.MIN_EVIDENCE,
+                        help="איזה חלק מן המידע שבשאילתה חייב להימצא בתוצאה")
     parser.add_argument("--queries", type=Path, default=EVAL,
                         help="קובץ שאילתות אחר (ברירת מחדל: data/eval/queries.json)")
     parser.add_argument("--source", choices=("all", "owner", "agent"), default="all",
@@ -176,6 +208,7 @@ def main() -> int:
         "D  משולב      ": lambda q, n: fuse(
             lexical(conn, q, join="OR", limit=n), semantic(q, n), limit=n
         ),
+        "E  OR + סף    ": lambda q, n: gated(conn, q, limit=n, floor=args.evidence),
     }
 
     graded = [i for i in items if i.get("gold")]
