@@ -435,7 +435,18 @@ def suggestions(query: str, exclude: Iterable[str] = (), limit: int = 4) -> list
     from . import semantic
 
     skip = set(exclude)
-    codes = [c for c in semantic.suggest_codes(query, limit + len(skip)) if c not in skip]
+    try:
+        found = semantic.suggest_codes(query, limit + len(skip))
+    except Exception:
+        # המדור הזה הוא תוספת, והחיפוש הלקסיקלי עומד בפני עצמו. בלי
+        # התפיסה הזאת כשל בשכבה הסמנטית — קובץ ווקטורים פגום, זיכרון
+        # שנגמר בטעינת מטריצה של 55 מגה, או קריסת עלייה קרה — מפיל את
+        # ‎/api/search‎ כולו ל-500. ה-JS בצד הלקוח בולע 500 בשקט, וכך
+        # המשתמש מקבל תיבת חיפוש שפשוט לא מציעה כלום, בלי שום סימן
+        # לכך שמשהו נשבר. עדיף לאבד את "עוד מהמאגר" ולשמור על התוצאות.
+        current_app.logger.exception("semantic suggestions failed")
+        return []
+    codes = [c for c in found if c not in skip]
     if not codes:
         return []
 

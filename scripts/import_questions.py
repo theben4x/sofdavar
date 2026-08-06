@@ -39,7 +39,7 @@ sys.path.insert(0, str(ROOT))
 from app import db as dbmod  # noqa: E402
 from app.codes import random_code  # noqa: E402
 from app.config import RESERVED_SLUGS  # noqa: E402
-from app.hebrew import slugify, unique_slug  # noqa: E402
+from app.hebrew import as_question, slugify, unique_slug  # noqa: E402
 
 DB_PATH = ROOT / "data" / "sofdavar.db"
 ENCODINGS = ("utf-8-sig", "utf-8", "cp1255")
@@ -116,7 +116,10 @@ def rows_from_json(path: Path) -> Iterator[dict[str, Any]]:
 def normalize_row(row: dict[str, Any]) -> dict[str, Any]:
     return {
         "category": str(row.get("category", "")).strip(),
-        "question": str(row.get("question", "")).strip(),
+        # סימן השאלה נוסף כאן ולא נסמך על מי שהכין את הקובץ: מקור חיצוני
+        # כותב כותרות ("צינורית המיחם", "מותר לרסס בושם בשבת") ולא שאלות,
+        # וכותרת בלי סימן שאלה נקראת כקביעה.
+        "question": as_question(str(row.get("question", ""))),
         "short_answer": str(row.get("short_answer", "")).strip(),
         "body": split_list(row.get("body")),
         "sources": split_list(row.get("sources")),
