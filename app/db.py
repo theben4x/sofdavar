@@ -432,19 +432,22 @@ def suggestions(query: str, exclude: Iterable[str] = (), limit: int = 4) -> list
     if not current_app.config.get("SEMANTIC_SUGGESTIONS"):
         return []
 
-    from . import semantic
-
     skip = set(exclude)
     try:
+        # הייבוא בתוך ה-try, ולא לפניו, וזה העיקר: ``app/semantic.py``
+        # מייבא ``numpy`` ברמת המודול, ו-numpy אינו ב-requirements.txt.
+        # מקומית הוא מותקן ולכן הכול עבד; ב-Vercel הוא חסר, הייבוא זרק
+        # ImportError, ו-‎/api/search‎ ו-‎/search‎ החזירו 500 מאז שהמדור
+        # הזה נוסף. ה-JS בצד הלקוח בולע 500 בשקט, ולכן זה נראה כמו תיבת
+        # חיפוש שפשוט הפסיקה להציע — בלי שום סימן שמשהו נשבר.
+        from . import semantic
+
         found = semantic.suggest_codes(query, limit + len(skip))
     except Exception:
-        # המדור הזה הוא תוספת, והחיפוש הלקסיקלי עומד בפני עצמו. בלי
-        # התפיסה הזאת כשל בשכבה הסמנטית — קובץ ווקטורים פגום, זיכרון
-        # שנגמר בטעינת מטריצה של 55 מגה, או קריסת עלייה קרה — מפיל את
-        # ‎/api/search‎ כולו ל-500. ה-JS בצד הלקוח בולע 500 בשקט, וכך
-        # המשתמש מקבל תיבת חיפוש שפשוט לא מציעה כלום, בלי שום סימן
-        # לכך שמשהו נשבר. עדיף לאבד את "עוד מהמאגר" ולשמור על התוצאות.
-        current_app.logger.exception("semantic suggestions failed")
+        # המדור הזה הוא תוספת, והחיפוש הלקסיקלי עומד בפני עצמו — לפי
+        # המדידה בראש app/semantic.py הוא גם החזק מבין השניים. עדיף
+        # לאבד את "עוד מהמאגר" מאשר את החיפוש כולו.
+        current_app.logger.exception("semantic suggestions unavailable")
         return []
     codes = [c for c in found if c not in skip]
     if not codes:
