@@ -17,6 +17,7 @@ CSV — שורת כותרות בעברית או באנגלית. עמודות מ�
     minhag_ashkenaz / אשכנז     הבדל מנהג                            [רשות]
     minhag_sepharad / ספרד      הבדל מנהג                            [רשות]
     keywords / מילות_חיפוש      מילים, מופרדות ב-| או בפסיק           [רשות]
+    topic / תת_נושא             תת-נושא בתוך הקטגוריה                 [רשות]
 
 JSON — או רשימה שטוחה של אובייקטים עם אותם שדות, או המבנה המקובץ
 ``[{"category": "shabbat", "questions": [...]}]``.
@@ -56,6 +57,8 @@ COLUMNS: dict[str, str] = {
     "minhag_sepharad": "minhag_sepharad", "ספרד": "minhag_sepharad",
     "keywords": "keywords", "מילות_חיפוש": "keywords", "מילות חיפוש": "keywords",
     "תגיות": "keywords",
+    # "נושא" כבר תפוס לקטגוריה, ולכן תת-הנושא מקבל שם מפורש.
+    "topic": "topic", "תת_נושא": "topic", "תת נושא": "topic",
 }
 
 REQUIRED = ("category", "question", "short_answer")
@@ -114,7 +117,7 @@ def rows_from_json(path: Path) -> Iterator[dict[str, Any]]:
 
 
 def normalize_row(row: dict[str, Any]) -> dict[str, Any]:
-    return {
+    item = {
         "category": str(row.get("category", "")).strip(),
         # סימן השאלה נוסף כאן ולא נסמך על מי שהכין את הקובץ: מקור חיצוני
         # כותב כותרות ("צינורית המיחם", "מותר לרסס בושם בשבת") ולא שאלות,
@@ -127,6 +130,12 @@ def normalize_row(row: dict[str, Any]) -> dict[str, Any]:
         "minhag_ashkenaz": (str(row.get("minhag_ashkenaz") or "").strip() or None),
         "minhag_sepharad": (str(row.get("minhag_sepharad") or "").strip() or None),
     }
+    # תת-הנושא נשמר רק כשיש בו ממש. מפתח ריק בכל שאלה מנפח את קובץ
+    # המקור בלי להוסיף מידע, והוא גם נכנס לחתימת הווקטור.
+    topic = str(row.get("topic") or "").strip()
+    if topic:
+        item["topic"] = topic
+    return item
 
 
 def main() -> int:
@@ -241,8 +250,8 @@ def main() -> int:
             """
             INSERT INTO questions (
                 category_id, code, slug, number, question, short_answer, body,
-                sources, minhag_ashkenaz, minhag_sepharad, keywords, sort_order
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                sources, minhag_ashkenaz, minhag_sepharad, keywords, topic, sort_order
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 category_id, code, slug, -(imported + 1_000_000),
@@ -251,6 +260,7 @@ def main() -> int:
                 json.dumps(row["sources"], ensure_ascii=False),
                 row["minhag_ashkenaz"], row["minhag_sepharad"],
                 json.dumps(row["keywords"], ensure_ascii=False),
+                row.get("topic") or "",
                 order,
             ),
         )

@@ -3,6 +3,9 @@
 הווקטורים נשמרים ב-``data/seed/embeddings.json`` ונכנסים ל-git יחד עם
 השאלות. בשרת אין חישוב ואין הורדה: הקובץ הזה כבר מוכן.
 
+הווקטור נבנה **שדה-שדה** ולא מטקסט אחד משורשר. המתכון והמשקלים יושבים
+ב-``app/embed.py`` (``FIELD_WEIGHTS``), יחד עם המדידה שהצדיקה אותם.
+
 למה חישוב מצטבר, אם ממילא הכול לוקח שנייה: הרווח אינו מהירות אלא
 יציבות ב-git. הוספת שאלה אחת משנה שורה אחת בקובץ, ולכן רואים בדיוק מה
 זז ואי אפשר לקלקל בטעות ווקטורים של שאלות ישנות.
@@ -30,23 +33,28 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from app.embed import MODEL_DIR, Encoder  # noqa: E402
+from app.embed import FIELD_WEIGHTS, MODEL_DIR, RECIPE, Encoder  # noqa: E402
 
 SEED = ROOT / "data" / "seed" / "questions.json"
 OUT = ROOT / "data" / "seed" / "embeddings.json"
 
+#: השדות שמשתתפים בווקטור. כל שדה אחר בשאלה יכול להשתנות בלי לגרור
+#: חישוב מחדש — וזה מכוון, כי תיקון פסיק בפסקה שלישית אינו מזיז ווקטור.
+FIELDS = ("question", "keywords", "short_answer", "body", "topic")
+
 
 def text_of(question: dict[str, Any]) -> str:
-    """הטקסט שממנו נגזר הווקטור.
+    """הטקסט שהחתימה נגזרת ממנו — לא הטקסט שמקודד.
 
-    השאלה עצמה ראשונה כי היא הקרובה ביותר לניסוח של המשתמש; מילות
-    המפתח אחריה כי הן נכתבו בדיוק בשביל ניסוחים חלופיים; והתשובה
-    הקצרה אחרונה כדי לתת הקשר. גוף התשובה **אינו** נכלל: הוא ארוך
-    ומדלל את הווקטור עד שהוא מפסיק להבדיל בין שאלות.
+    הקידוד עצמו נעשה ב-``Encoder.encode_documents``, שדה-שדה. כאן רק
+    צריך מחרוזת יציבה שמשתנה בדיוק כשאחד השדות המשתתפים משתנה. גוף
+    התשובה נחתך לפסקה הראשונה בלבד, כי רק היא נכנסת לווקטור.
     """
-    parts = [question["question"], *question.get("keywords", []),
-             question.get("short_answer", "")]
-    return "\n".join(p for p in parts if p)
+    snapshot = {
+        field: (question.get("body") or [])[:1] if field == "body" else question.get(field)
+        for field in FIELDS
+    }
+    return json.dumps(snapshot, sort_keys=True, ensure_ascii=False)
 
 
 def main() -> int:
@@ -61,7 +69,12 @@ def main() -> int:
             "    הריצו קודם: python scripts/prune_model.py"
         )
 
-    fingerprint = json.dumps(encoder.meta, sort_keys=True, ensure_ascii=False)
+    # החתימה מכסה גם את **המתכון** ולא רק את המודל: שינוי במשקלי השדות
+    # משנה כל ווקטור במאגר, ובלי זה היה נשאר חצי מאגר בשיטה הישנה.
+    fingerprint = json.dumps(
+        {"model": encoder.meta, "recipe": RECIPE, "weights": FIELD_WEIGHTS},
+        sort_keys=True, ensure_ascii=False,
+    )
     groups = json.loads(SEED.read_text("utf-8"))
 
     previous: dict[str, Any] = {}
@@ -102,7 +115,7 @@ def main() -> int:
               f"{'…' if len(removed) > 8 else ''})")
 
     if stale:
-        computed = encoder.encode_many([text_of(s["question"]) for s in stale])
+        computed = encoder.encode_documents([s["question"] for s in stale])
         for entry, vector in zip(stale, computed):
             vectors[entry["code"]] = {
                 "hash": entry["hash"],
@@ -127,8 +140,8 @@ def main() -> int:
 
     OUT.write_text(
         json.dumps(
-            {"model": encoder.meta, "dim": encoder.dim,
-             "vectors": dict(sorted(vectors.items()))},
+            {"model": encoder.meta, "recipe": RECIPE, "weights": FIELD_WEIGHTS,
+             "dim": encoder.dim, "vectors": dict(sorted(vectors.items()))},
             ensure_ascii=False, indent=1,
         ) + "\n",
         "utf-8",
