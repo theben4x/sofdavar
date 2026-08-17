@@ -28,3 +28,8 @@ draft_review*.json
 draft_final.json
 run566_final.json
 data/seed/units_wanted.json
+
+# פלטים גולמיים של סבבי הייבוא וההרחבה. התוכן שעבר את הבקרה כבר יושב
+# ב-data/seed/questions.json, ולכן הקבצים האלה הם פיגומים ולא מקור.
+book_import.json
+expand_raw.json
