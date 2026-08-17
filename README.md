@@ -44,6 +44,23 @@ python scripts/spec_to_docx.py docs/tech-spec.md "docs/סוף דבר — אפי�
 
 יש לערוך את ה-Markdown ולבנות מחדש, ולא לערוך את ה-docx ולאבד את המקור.
 
+## המצגת
+
+`docs/סוף דבר — מצגת הפרויקט.pptx` נבנית מ-`scripts/make_deck.mjs`. זו התלות
+היחידה של הפרויקט ב-Node, והיא לצורך הבנייה בלבד — האתר עצמו הוא Python:
+
+```bash
+npm install                    # pptxgenjs, פעם אחת
+node scripts/make_deck.mjs     # כותב אל docs/
+```
+
+צילומי המסך שבמצגת יושבים ב-`docs/deck-assets/`.
+
+הבנייה מריצה בסופה את `scripts/fix_pptx_bidi.py`, שמפצל כל ריצת טקסט לפי
+כתב ומסמן `rtl` בכל אחת. בלעדיו PowerPoint מדפיס «512MB» כ-«MB512» וגוזם
+רווחים בגבול בין לטינית לעברית — שני פגמים שנמדדו מול PowerPoint עצמו.
+כאן גם התשובה לשאלה למה לא לערוך את ה-pptx ביד: העריכה תישרף בבנייה הבאה.
+
 ## תוכן
 
 ### הוספת שאלות

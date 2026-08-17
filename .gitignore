@@ -33,3 +33,9 @@ data/seed/units_wanted.json
 # ב-data/seed/questions.json, ולכן הקבצים האלה הם פיגומים ולא מקור.
 book_import.json
 expand_raw.json
+
+# תלות אחת ויחידה של Node, ורק לבניית המצגת:
+#     npm install  &&  node scripts/make_deck.mjs
+# האתר עצמו אינו משתמש ב-Node כלל.
+node_modules/
+package-lock.json

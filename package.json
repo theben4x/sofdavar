@@ -1,0 +1,11 @@
+{
+  "name": "sofdavar-deck",
+  "private": true,
+  "description": "בניית מצגת הפרויקט בלבד. האתר עצמו הוא Python ואינו תלוי ב-Node.",
+  "scripts": {
+    "deck": "node scripts/make_deck.mjs"
+  },
+  "devDependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}
