@@ -505,24 +505,27 @@
  },
  {
   "query": "יש ברכה שאומרים אחרי שיוצאים מהשירותים",
-  "gold": null,
+  "gold": "mw8c",
   "style": "sentence",
   "slice": "absent",
-  "source": "agent"
+  "source": "agent",
+  "relabelled": "corpus"
  },
  {
   "query": "קמתי בבוקר ונגעתי באוכל לפני ששטפתי ידיים זה בעיה",
-  "gold": null,
+  "gold": "z29u",
   "style": "sentence",
   "slice": "absent",
-  "source": "agent"
+  "source": "agent",
+  "relabelled": "2026-08"
  },
  {
   "query": "התחתנתי לפני חודש חייבת לכסות את השיער עם פאה",
-  "gold": null,
+  "gold": "2475",
   "style": "sentence",
   "slice": "absent",
-  "source": "agent"
+  "source": "agent",
+  "relabelled": "corpus"
  },
  {
   "query": "קניתי מעיל צמר בחול צריך לבדוק אם יש בו פשתן",
@@ -540,10 +543,11 @@
  },
  {
   "query": "בחג אפשר לבשל רגיל או שזה אסור כמו בשבת",
-  "gold": null,
+  "gold": "cx87",
   "style": "sentence",
   "slice": "absent",
-  "source": "agent"
+  "source": "agent",
+  "relabelled": "2026-08"
  },
  {
   "query": "גר בקומה שביעית איפה מדליקים חנוכיה",
@@ -554,24 +558,27 @@
  },
  {
   "query": "אני לא סובל אלכוהול כמה חייבים לשתות בפורים",
-  "gold": null,
+  "gold": "mjdc",
   "style": "sentence",
   "slice": "absent",
-  "source": "agent"
+  "source": "agent",
+  "relabelled": "corpus"
  },
  {
   "query": "מה ההבדל בין מצה רגילה למצה שמורה בליל הסדר",
-  "gold": null,
+  "gold": "n39f",
   "style": "sentence",
   "slice": "absent",
-  "source": "agent"
+  "source": "agent",
+  "relabelled": "corpus"
  },
  {
   "query": "כאב ראש חזק בצום מותר לקחת אקמול",
-  "gold": null,
+  "gold": "vd7m",
   "style": "fragment",
   "slice": "absent",
-  "source": "agent"
+  "source": "agent",
+  "relabelled": "2026-08"
  },
  {
   "query": "שכחתי להדליק נרות מה עושים",
@@ -597,10 +604,11 @@
  },
  {
   "query": "מה מברכים על שוקולד",
-  "gold": null,
+  "gold": "dbm6",
   "style": "sentence",
   "slice": "owner",
-  "source": "owner"
+  "source": "owner",
+  "relabelled": "corpus"
  },
  {
   "query": "אפשר לפתוח מקרר בשבת",
@@ -625,10 +633,11 @@
  },
  {
   "query": "מותר לשמוע מוזיקה בבין המצרים",
-  "gold": null,
+  "gold": "dhff",
   "style": "sentence",
   "slice": "owner",
-  "source": "owner"
+  "source": "owner",
+  "relabelled": "corpus"
  },
  {
   "query": "איך מכשירים כלים חדשים",
@@ -681,10 +690,11 @@
  },
  {
   "query": "מותר לנסוע לים בתשעת הימים",
-  "gold": null,
+  "gold": "wcmn",
   "style": "sentence",
   "slice": "owner",
-  "source": "owner"
+  "source": "owner",
+  "relabelled": "corpus"
  },
  {
   "query": "הילד שלי בן 5 חייב להתפלל",
